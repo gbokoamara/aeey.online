@@ -1,0 +1,8 @@
+/* index.css */
+body {
+  background-color: green;
+  display: grid;
+  place-items: center; /* centre horizontal + vertical */
+  min-height: 100vh;
+  margin: 0;
+}
