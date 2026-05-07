@@ -1,13 +1,14 @@
 import BackButton from "../utils/backButton";
 import { UpdateForm } from "../component/form/profilForm";
+import { useUser } from "../hooks/useUser";
 
 export const MemberPage = () => {
+  const { memberRequest } = useUser()
 
-
-  const handleSubmit = () => {
+  const handleSubmit = (cardData) => {
      alert("demande de verification soumis avec succès !")
-    // console.log({ ...form, photo });
-    redirect("/home")
+    memberRequest(cardData)
+    // redirect("/home")
   };
   const title= "Vérification membre"
   return (

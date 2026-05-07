@@ -5,6 +5,7 @@ import Button from "../../../utils/button"
 import { useState } from "react"
 import {UpdateForm} from "../../form/profilForm"
 import { useUser } from "../../../hooks/useUser"
+import { Modal } from "../../../utils/Modal"
 
 
 export const ProfilPage = () => {
@@ -81,10 +82,17 @@ export const ProfilPage = () => {
         </div>
         {activeModal && (
           // formulaire de mise à jour
-          <div>
-            <Button children="X" onClick={() => setActiveModal(false)} className="bg-amber-50 text-black"/>
-            <UpdateForm handleValidate={handleValidate} title={"modifier le profil"} />
-          </div>
+          <Modal
+            isOpen={activeModal}
+            onClose={() => setActiveModal(false)}
+            showCloseButton={false}
+          >
+          <UpdateForm handleValidate={handleValidate} title={"modifier le profil"} />    
+          </Modal>
+          // <div className="fixed inset-0  bg-black/90 py-20">
+          //   <Button children="X" onClick={() => setActiveModal(false)} className="bg-amber-50 text-black"/>
+          //   <UpdateForm handleValidate={handleValidate} title={"modifier le profil"} />
+          // </div>
         )}
         </>
     )

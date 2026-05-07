@@ -1,16 +1,16 @@
-import { SkipBack } from "lucide-react";
+import { CloudBackup, SkipBack, ArrowBigLeft } from "lucide-react";
 
 const BackButton = ({
   href = "/home",
   className = "",
-  iconSize = "w-6 h-6 md:w-9 md:h-9",
+  iconSize = "w-6 h-6 md:w-7 md:h-7",
 }) => {
   return (
     <a
       href={href}
-      className={`absolute text-white ${className}`}
+      className={`absolute text-white flex gap-2 ${className}`}
     >
-      <SkipBack className={iconSize} />
+      <ArrowBigLeft className={iconSize} /> <span className="italic">Accueil</span>
     </a>
   );
 };

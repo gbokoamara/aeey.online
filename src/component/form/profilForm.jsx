@@ -4,44 +4,40 @@ import { useRedirect } from "../../hooks/useNavigate";
 import Input from "../../utils/input";
 import ImageUpload from "../../utils/imageUpload";
 import Button from "../../utils/button";
-import { userOnLocal } from "../../helper/getUser";
+import { memberOnLocal, userOnLocal } from "../../helper/getUser";
+import { logData } from "../../utils/console";
 
 export const UpdateForm = ({ handleValidate, title }) => {
-  const user = userOnLocal()
+  const user = userOnLocal();
+  const member = memberOnLocal()
   const redirect = useRedirect();
   const [step, setStep] = useState(0);
-
+  const finalUser = user ? user : member
   const [photo, setPhoto] = useState(user.photo || null);
-
-    // ,
-    // ,
-    // photo,
-    // city,
-    // address,
-    // ,
-    // occupation,
-    // entreprise,
   
   const [form, setForm] = useState({
-    firstName: user.firstName || "",
-    lastName: user.lastName || "",
-    dateNaissance: user.firstName || "",
-    sexe: user.sex || "",
-    telephone: user.number || "",
-    email: user.email || "",
+    firstName: finalUser.firstName || "",
+    lastName: finalUser.lastName || "",
+    dateNaissance: finalUser.birthDate ? finalUser.birthDate.split('T')[0] : "",
+    sex: finalUser.sex || "",
+    telephone: finalUser.number || "",
+    email: finalUser.email || "",
+    city: finalUser.city || "",
+    address: finalUser.address ||"",
 
-    etablissement: user.etablissement || "",
-    niveau: user.niveau || "",
-    filiere: user.filiere || "",
-    matricule: user.matricule || "",
+    etablissement: finalUser.etablissement || "",
+    niveau: finalUser.niveau || "",
+    filiere: finalUser.filiere || "",
+    matricule: finalUser.matricule ||  "",
 
-    document: user.document || null,
-
+    occupation: finalUser.occupation || "",
+    entreprise: finalUser.entreprise || "",
+    document: finalUser.document || null,
     dejaMembre: false,
-    numeroMembre: "",
-    section: user.section || "",
+    numeroMembre:  finalUser.numeroMembre || "",
+    section: finalUser.section || "",
     certifie: false,
-    statut:"", // en_attente | refuse | valide
+    statut: finalUser.memberStatus || "", // en_attente | refuse | valide
   });
 
   const handleChange = (name, value) => {
@@ -66,6 +62,7 @@ export const UpdateForm = ({ handleValidate, title }) => {
   };
 
   const handleSubmit = () => {
+    logData("form", form)
     handleValidate(form)
   }
 
@@ -119,19 +116,36 @@ export const UpdateForm = ({ handleValidate, title }) => {
 
           <Input
             type="date"
+            value={form.dateNaissance}
             onChange={(e) => handleChange("dateNaissance", e.target.value)}
           />
 
           <Input
             type="text"
             placeholder="Sexe"
-            onChange={(e) => handleChange("sexe", e.target.value)}
+            value={form.sex}
+            onChange={(e) => handleChange("sex", e.target.value)}
           />
 
           <Input
             type="email"
             placeholder="Email"
+            value={form.email}
             onChange={(e) => handleChange("email", e.target.value)}
+          />
+
+          <Input
+            type="text"
+            placeholder="Ville"
+            value={form.city}
+            onChange={(e) => handleChange("city", e.target.value)}
+          />
+
+          <Input
+            type="text"
+            placeholder="Village/Quartier"
+            value={form.address}
+            onChange={(e) => handleChange("address", e.target.value)}
           />
 
           <div className="flex justify-between gap-1">
@@ -149,24 +163,28 @@ export const UpdateForm = ({ handleValidate, title }) => {
           <Input
             type="text"
             placeholder="Établissement"
+            value={form.etablissement}
             onChange={(e) => handleChange("etablissement", e.target.value)}
           />
 
           <Input
             type="text"
             placeholder="Niveau"
+            value={form.niveau}
             onChange={(e) => handleChange("niveau", e.target.value)}
           />
 
           <Input
             type="text"
             placeholder="Filière"
+            value={form.filiere}
             onChange={(e) => handleChange("filiere", e.target.value)}
           />
 
           <Input
             type="text"
             placeholder="Matricule"
+            value={form.matricule}
             onChange={(e) => handleChange("matricule", e.target.value)}
           />
 
@@ -182,7 +200,21 @@ export const UpdateForm = ({ handleValidate, title }) => {
         <>
           <p className="font-semibold">Justificatif (carte scolaire ou cni) </p>
 
-          <input
+          <Input
+            type="text"
+            placeholder="occupation"
+            value={form.occupation}
+            onChange={(e) => handleChange("occupation", e.target.value)}
+          />
+
+          <Input
+            type="text"
+            placeholder="entreprise"
+            value={form.entreprise}
+            onChange={(e) => handleChange("entreprise", e.target.value)}
+          />
+
+          <Input
             type="file"
             onChange={(e) => handleChange("document", e.target.files[0])}
           />
@@ -199,38 +231,17 @@ export const UpdateForm = ({ handleValidate, title }) => {
         <>
           <p className="font-semibold">Lien avec l'association</p>
 
-          {/* Checkbox */}
-          {/* <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={form.dejaMembre}
-                onChange={(e) =>
-                  handleChange("dejaMembre", e.target.checked)
-                }
-              />
-              Déjà membre
-            </label> */}
-
-          {/* Condition */}
-          {/* {form.dejaMembre && (
-              <Input
-                type="text"
-                placeholder="Numéro membre"
-                onChange={(e) =>
-                  handleChange("numeroMembre", e.target.value)
-                }
-              />
-            )} */}
-
           <Input
             type="text"
             placeholder="Section / Promotion"
+            value={form.section}
             onChange={(e) => handleChange("section", e.target.value)}
           />
 
           <label className="flex items-center gap-2 text-sm">
             <input
               type="checkbox"
+              value={form.certifie}
               onChange={(e) => handleChange("certifie", e.target.checked)}
             />
             Je certifie que les informations sont exactes

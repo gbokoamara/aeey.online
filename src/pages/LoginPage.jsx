@@ -33,7 +33,7 @@ export const LoginPage = () => {
 
   return (
     <>
-      <section className=' flex justify-center items-center h-[88vh] md:h-[91vh] min-w-screen px-10'
+      <section className=' flex justify-center items-center h-[50vh] md:h-[91vh] min-w-screen md:px-10'
       // className='bg-slate-800 text-white flex justify-center items-center min-h-screen min-w-screen p-10'
       >
         
@@ -42,9 +42,9 @@ export const LoginPage = () => {
             <h1>bienvenue chez A.E.E.Y !</h1>
             <p>Pour commencer, entrez votre nom et votre numero mobile.</p>
           </div>
-          <div>
+          {/* <div>
             <Input type={"text"} placeholder={"Nom"}  onChange={(e)=> setName(e.target.value)} />
-          </div>
+          </div> */}
           <div>
             <Input type={"tel"} placeholder={"Telephone"} onChange={(e)=> setNumber(e.target.value)} value={number} required={true}  />
             </div>

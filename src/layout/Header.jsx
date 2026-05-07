@@ -4,16 +4,16 @@ import PinInput from "../utils/pinInput";
 import { useAuth } from "../hooks/useAuth";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import { logData } from "../utils/console";
+import { Modal } from "../utils/Modal";
 
 const Header = () => {
-  const {verifyPin}  = useAuth()
+  const { verifyPin } = useAuth();
   const [showBalance, setShowBalance] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [showPinInput, setShowPinInput] = useState(false);
   const [isUnlocked, setIsUnlocked] = useState(false);
-  const {getItem} = useLocalStorage()
-  const user = getItem("user")
-
+  const { getItem } = useLocalStorage();
+  const user = getItem("user");
 
   const timeoutRef = useRef(null); // pour gérer le timer
 
@@ -37,8 +37,8 @@ const Header = () => {
 
   //  Quand le PIN est correct
   const handlePinComplete = async (pin) => {
-    logData("pin", pin)
-    const isMatch = await verifyPin(pin, user?.id)
+    logData("pin", pin);
+    const isMatch = await verifyPin(pin, user?.id);
     if (isMatch === true) {
       setIsUnlocked(true);
       setShowBalance(true);
@@ -71,7 +71,6 @@ const Header = () => {
   return (
     <>
       <div className="sticky top-0 bg-green-600 h-16 z-50 flex items-center px-4 text-white w-screen">
-        
         <a href="/settings">
           <Settings className="w-6 h-6" />
         </a>
@@ -105,20 +104,24 @@ const Header = () => {
 
       {/*  MODAL PIN */}
       {showPinInput && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-2xl shadow-lg text-center">
-            <h2 className="mb-4 font-semibold">Entrer votre code PIN</h2>
+        <Modal
+          isOpen={showPinInput}
+          onClose={() => setShowPinInput(false)}
+          showCloseButton={false}
+        >
+          <h2 className="mb-4 font-semibold text-center">
+            Entrer votre code PIN
+          </h2>
 
-            <PinInput length={4} onComplete={handlePinComplete} />
+          <PinInput length={4} onComplete={handlePinComplete} />
 
-            <button
-              onClick={() => setShowPinInput(false)}
-              className="mt-4 text-sm text-gray-500"
-            >
-              Annuler
-            </button>
-          </div>
-        </div>
+          <button
+            onClick={() => setShowPinInput(false)}
+            className="mt-4 text-sm text-gray-500 block mx-auto"
+          >
+            Annuler
+          </button>
+        </Modal>
       )}
     </>
   );

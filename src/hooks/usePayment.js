@@ -5,23 +5,27 @@ import { logData } from "../utils/console";
 import { useLocalStorage } from "./useLocalStorage";
 import { useState } from "react";
 import { useRedirect } from "./useNavigate";
+import { userOnLocal } from "../helper/getUser";
 
-export const useAuth = () => {
-    const [ loading, setLoading ] = useState(false)
-    const {setItem, removeItem} = useLocalStorage()
-    const redirect = useRedirect()
+export const useUser = () => {
+    const [ loading, setLoading ] = useState(false);
+    const {setItem, removeItem} = useLocalStorage();
+    const redirect = useRedirect();
+    const user = userOnLocal();
+    const userId = user.id;
+    
 
-    const login = async (firstName, number) => {
+    const update = async (updateDate) => {
         setLoading(true)
         try {
-            const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AUTH.REGISTER}`
+            const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.USER.UPDATE}/${userId}`
             logData("fetchUrl", url)
-            const response = await axios.post(url, {firstName, number})
-            logData("response on login", response)
+            const response = await axios.post(url, {updateDate})
+            logData("response on update", response)
             const user = response?.data?.user
             logData("userData on login", user)
-            setItem("user", user)
-            return user
+            // setItem("user", user)
+            // return user
         } catch (error) {
             console.error("login error", error)
         } finally {
@@ -30,7 +34,7 @@ export const useAuth = () => {
         
     }
 
-    const createPin = async (password, userId) => {
+    const memberRequest = async (password, userId) => {
         setLoading(true)
         try {
             const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AUTH.PASSWORD}/${userId}`
@@ -49,7 +53,7 @@ export const useAuth = () => {
         
     };
 
-    const verifyPin = async (password, userId) => {
+    const cardRequest = async (password, userId) => {
             logData("password", password)
             logData("userId", userId)
 
@@ -71,11 +75,8 @@ export const useAuth = () => {
         
     };
 
-    const logout = (user) => {
-        removeItem(user);
-        redirect("/")
-    }
+    
 
-    return {login, createPin, logout, verifyPin};
+    return {update, memberRequest, cardRequest};
 }
 

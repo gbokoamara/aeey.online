@@ -34,17 +34,17 @@ export const useUser = () => {
         
     }
 
-    const memberRequest = async (password, userId) => {
+    const memberRequest = async (cardData) => {
         setLoading(true)
         try {
-            const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AUTH.PASSWORD}/${userId}`
+            const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.USER.MEMBER_REQUEST}/${userId}`
             logData("passUrl", url)
-            const response = await axios.put(url, {password})
-            logData("response on pass", response)
-            const user = response?.data?.user
-            logData("userData on pass", user)
-            setItem("user", user)
-            return user
+            const response = await axios.post(url, {cardData})
+            logData("response on member-request", response)
+            const member = response?.data?.member
+            logData("cardData on request", member)
+            setItem("member", member)
+            return member
         } catch (error) {
             console.error("login error", error)
         } finally {
@@ -53,20 +53,20 @@ export const useUser = () => {
         
     };
 
-    const verifyPin = async (password, userId) => {
+    const cardRequest = async (cardData) => {
             logData("password", password)
             logData("userId", userId)
 
         setLoading(true)
         try {
-            const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AUTH.VERIFY_PASSWORD}/${userId}`
+            const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.USER.CARD_REQUEST}/${userId}`
             logData("passUrl", url)
-            const response = await axios.post(url, {password})
-            logData("response on pass", response)
-            const isMatch = response?.data?.isMatch
-            logData("userData on pass", isMatch)
-            // setItem("user", user)
-            return isMatch
+            const response = await axios.post(url, {cardData})
+            logData("response on card-request", response)
+            const card = response?.data?.card
+            logData("userData on pass", card)
+            setItem("card", card)
+            return card
         } catch (error) {
             console.error("login error", error)
         } finally {
@@ -75,8 +75,63 @@ export const useUser = () => {
         
     };
 
-    
+    const getCard = async () => {
+        setLoading(true)
+        try {
+            const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.USER.GET_CARD}/${userId}`
+            logData("passUrl", url)
+            const response = await axios.get(url,)
+            logData("response on get-card", response)
+            const card = response?.data?.card
+            logData("userData on pass", card)
+            setItem("card", card)
+            return card
+        } catch (error) {
+            console.error("login error", error)
+        } finally {
+            setLoading(false)
+        }
+        
+    };
 
-    return {update, memberRequest};
+    const makePayment = async (payementData) => {
+        setLoading(true)
+        try {
+            const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.USER.MAKE_PAYMENT}/${userId}`
+            logData("passUrl", url)
+            const response = await axios.get(url,payementData )
+            logData("response on get-payment", response)
+            const payment = response?.data?.payment
+            logData("userData on user payment", payment)
+            setItem("payment", payment)
+            return payment
+        } catch (error) {
+            console.error("login error", error)
+        } finally {
+            setLoading(false)
+        }
+        
+    };
+
+    const getPayment = async () => {
+        setLoading(true)
+        try {
+            const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.USER.GET_PAYMENT}/${userId}`
+            logData("passUrl", url)
+            const response = await axios.get(url,)
+            logData("response on get-card", response)
+            const payment = response?.data?.payment
+            logData("userData on user payment", payment)
+            setItem("payment", payment)
+            return payment
+        } catch (error) {
+            console.error("login error", error)
+        } finally {
+            setLoading(false)
+        }
+        
+    };
+
+    return {update, memberRequest, cardRequest, getCard, makePayment, getPayment};
 }
 

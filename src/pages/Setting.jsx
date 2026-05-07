@@ -16,6 +16,7 @@ import { useLocalStorage } from "../hooks/useLocalStorage";
 import { logData } from "../utils/console";
 import { userOnLocal } from "../helper/getUser";
 import { AddEvent } from "../component/events/eventForm";
+import { ExpensePage } from "../component/expenses/ExpensesComponent";
 
 export const SettingPage = () => {
   const {logout} = useAuth()
@@ -68,7 +69,9 @@ export const SettingPage = () => {
       case "dashboard":
         return <Dashboard />;
       case "events":
-        return <AddEvent />;  
+        return <AddEvent />;
+      case "expenses":
+        return <ExpensePage />;  
       default:
         return null;
     }
@@ -80,6 +83,7 @@ export const SettingPage = () => {
   
   return (
     <div className="min-h-screen grid md:grid-cols-6 p-2 gap-5">
+      <BackButton className="top-2" />
 
       {/* ================= MOBILE FULLSCREEN ================= */}
       {activeComponent && !isDesktop && (
@@ -166,12 +170,17 @@ export const SettingPage = () => {
                 onClick={() => handleClick("events")}
               />
 
+              <Button
+                children="Gestion des dépenses"
+                onClick={() => handleClick("expenses")}
+              />
+
             </div>
           )}
 
           {/* LOGOUT */}
           <div className="">
-            <Button children="Se déconnecter" className={'bg-red-500 hover:bg-red-600'} onClick={handleLogout}/>
+            <Button children="Se déconnecter" className={'bg-red-500 hover:bg-red-600 w-full'} onClick={handleLogout}/>
           </div>
 
         </div>

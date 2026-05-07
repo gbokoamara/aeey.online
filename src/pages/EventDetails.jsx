@@ -1,32 +1,27 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { eventsAds } from "../data/payment";
+import { useEvent } from "../hooks/useEvent";
+import BackButton from "../utils/backButton";
 
 export const EventDetail = () => {
+  const { event, getEvent } = useEvent()
   const { id } = useParams();
 
-  const [event, setEvent] = useState(() => {
-    // fallback local (important)
-    return eventsAds.find((e) => String(e.id) === String(id)) || null;
-  });
+  // const [event, setEvent] = useState(() => {
+  //   // fallback local (important)
+  //   return events.find((e) => String(e.id) === String(id)) || null;
+  // });
 
   useEffect(() => {
-    fetch(`/api/events/${id}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("API error");
-        return res.json();
-      })
-      .then((data) => setEvent(data))
-      .catch(() => {
-        // on garde le fallback local si API échoue
-        console.log("fallback local utilisé");
-      });
+        getEvent(id)
   }, [id]);
 
   if (!event) return <p>Événement introuvable...</p>;
 
   return (
-    <div className="p-4 bg-amber-50">
+    <div className="p-4 bg-amber-50 ">
+      <BackButton className="top-10" />
       <img
         src={event.image}
         alt={event.title}
