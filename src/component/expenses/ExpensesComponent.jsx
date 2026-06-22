@@ -1,21 +1,36 @@
-
 import { useEffect, useState } from "react";
 import Input from "../../utils/input";
 import Button from "../../utils/button";
-import { useEvent } from "../../hooks/useEvent";
+import { Modal } from "../../utils/Modal";
+import { logData } from "../../utils/console";
+import { PaymentCard } from "../cards/PaymentCard";
+import { useExpense } from "../../hooks/useExpense";
+import { ExpenseCard } from "./ExpenseCard";
 
 export const ExpensePage = () => {
-  const { events, addEvent, updateEvent, deleteEvent, getAllActiveEvents } = useEvent();
+  const [activeModal, setActiveModal] = useState(false);
+  const [reschedule, setReschedule] = useState("");
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [selectedExpense, setSelectedExpense] = useState(null);
+  const {
+    loading,
+    expense,
+    expenses,
+    addExpense,
+    updateExpense,
+    getAllExpenses,
+    getExpense,
+    deleteExpense,
+  } = useExpense();
 
-  const [form, setForm] = useState({
-    title: "",
+  const [form, setForm] = useState({ //     
+    name: "",
     description: "",
-    date: "",
-    location: "",
-    image: "",
+    phoneNumber: "",
+    amount: "",
+    method: "",
   });
-
-  const [selectedEvent, setSelectedEvent] = useState(null);
 
   const handleChange = (name, value) => {
     setForm({ ...form, [name]: value });
@@ -23,141 +38,230 @@ export const ExpensePage = () => {
 
   const resetForm = () => {
     setForm({
-      title: "",
+      name: "",
       description: "",
-      date: "",
-      location: "",
-      image: "",
+      phoneNumber: "",
+      amount: "",
+      method: "",
     });
-    setSelectedEvent(null);
+    setSelectedExpense(null);
+    setActiveModal(false);
   };
 
   const handleSubmit = async () => {
     try {
-      if (selectedEvent) {
-        await updateEvent(selectedEvent.id, form);
-        // alert("Event modifié !");
+      if (reschedule === "Modifier") {
+        await updateExpense(selectedExpense.id, form);
+        // alert("Expense modifié !");
       } else {
-        await addEvent(form);
-        alert("Event ajouté !");
+        await addExpense(form);
+        // alert("Expense ajouté !");
       }
       resetForm();
-      getAllActiveEvents();
+      getAllExpenses();
+      setReschedule(false);
     } catch (err) {
       console.error(err);
     }
   };
 
-  const handleEdit = (event) => {
-    setSelectedEvent(event);
+
+  const handleEdit = (expense) => {
+    setSelectedExpense(expense);
     setForm({
-      title: event.title,
-      description: event.description,
-      date: event.date?.slice(0, 10),
-      location: event.location,
-      image: event.image,
+      name: expense.name,
+      description: expense.description,
+      phoneNumber: expense.phoneNumber,
+      amount: expense.amount,
+      method: expense.method,
     });
   };
 
-  const handleDelete = async (id) => {
+
+
+    const handleDelete = async (expense) => {
     if (confirm("Supprimer cet événement ?")) {
-      await deleteEvent(id);
-      getAllActiveEvents();
+      await deleteExpense(expense.id);
     }
+    getAllExpenses()
   };
 
   useEffect(() => {
-    getAllActiveEvents();
+    getAllExpenses()
   }, []);
 
+  const getTitle = () => {
+    
+     if (reschedule === "Modifier") {
+      return "Modifier une dépense";
+    } else {
+      return "Ajouter une dépense";
+    }
+  };
+
+  const submitTitle = () => {
+    if (reschedule === "Modifier") {
+      return "Modifier";
+    } else {
+      return "Ajouter ";
+    }
+  };
+
+  // filtrage
+  const safeExpenses = Array.isArray(expenses) ? expenses : [];
+  // filtrage simple
+  const filteredExpenses = safeExpenses?.filter((e) => {
+    const matchSearch =
+      e.name.toLowerCase().includes(search.toLowerCase()) ||
+      e.method?.toLowerCase().includes(search.toLowerCase());
+
+    if (statusFilter === "ALL") return matchSearch;
+    if (statusFilter === "ACTIVE") return matchSearch && e.isActive;
+    if (statusFilter === "INACTIVE") return matchSearch && !e.isActive;
+
+    return matchSearch;
+  });
+
+  // stats
+  const total = expenses?.length || 0;
+  const activeCount = safeExpenses.filter((e) => e.amount).length;
+  const inactiveCount = total - activeCount;
+
+  if (loading) {
+    return <div>Chargement en cours ...</div>;
+  }
   return (
-    <div className="p-6 grid md:grid-cols-2 gap-6">
-      
-      {/* FORMULAIRE */}
-      <div className="bg-white shadow-xl rounded-2xl p-5 space-y-4">
-        <h2 className="text-xl font-semibold">
-          {selectedEvent ? "Modifier l'événement" : "Ajouter un événement"}
-        </h2>
-
-        <Input value={form.title} type="text" placeholder="Titre"
-          onChange={(e) => handleChange("title", e.target.value)} />
-
-        <Input value={form.description} type="text" placeholder="Description"
-          onChange={(e) => handleChange("description", e.target.value)} />
-
-        <Input value={form.date} type="date"
-          onChange={(e) => handleChange("date", e.target.value)} />
-
-        <Input value={form.location} type="text" placeholder="Lieu"
-          onChange={(e) => handleChange("location", e.target.value)} />
-
-        <Input value={form.image} type="text" placeholder="URL image"
-          onChange={(e) => handleChange("image", e.target.value)} />
-
-        <div className="flex gap-2">
-          <Button onClick={handleSubmit}>
-            {selectedEvent ? "Modifier" : "Ajouter"}
-          </Button>
-
-          {selectedEvent && (
-            <Button onClick={resetForm} variant="secondary">
-              Annuler
-            </Button>
-          )}
+    <div className="p-6 grid  gap-6">
+      {/* <div className="bg-indigo-500 w-full h-10"> */}
+      {/* zone de filtre et stats + boutton ajouter */}
+      <div className="bg-white shadow-md rounded-2xl p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        {/* LEFT: STATS */}
+        <div className="flex gap-4 text-sm">
+          <div className="bg-gray-100 px-3 py-1 rounded-xl">
+            Total: <span className="font-semibold">{total}</span>
+          </div>
+          <div className="bg-green-100 text-green-700 px-3 py-1 rounded-xl">
+            Actifs: {activeCount}
+          </div>
+          <div className="bg-red-100 text-red-700 px-3 py-1 rounded-xl">
+            Inactifs: {inactiveCount}
+          </div>
         </div>
-      </div>
 
-      {/* LISTE EVENTS */}
-      {events.length > 0 && (
-        <div className="space-y-4">
-        {events.map((event) => (
-          <div
-            key={event.id}
-            className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition cursor-pointer"
-            onClick={() => handleEdit(event)}
+        {/* CENTER: FILTER */}
+        <div className="flex gap-2 flex-1 md:max-w-md">
+          <input
+            type="text"
+            placeholder="Rechercher..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full border rounded-xl px-3 py-2 text-sm"
+          />
+
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="border rounded-xl px-2 text-sm"
           >
-            {event.image && (
-              <img
-                src={event.image}
-                alt={event.title}
-                className="w-full h-40 object-cover"
+            <option value="ALL">Tous</option>
+            <option value="ACTIVE">Actifs</option>
+            <option value="INACTIVE">Inactifs</option>
+          </select>
+        </div>
+
+        {/* RIGHT: ADD BUTTON */}
+        <Button
+          children="+ Ajouter"
+          onClick={(e) => {
+            e.stopPropagation();
+            resetForm();
+            setReschedule("Ajouter");
+            setActiveModal(true);
+          }}
+          className="bg-indigo-600 text-white px-4 py-2 rounded-xl"
+        />
+      </div>
+      {/* </div> */}
+      {/* LISTE ExpenseS */}
+      {expenses.length > 0 && (
+        <div className="space-y-1 grid ">
+          {expenses.map((expense) => (
+            
+          <ExpenseCard expense={expense} key={expense.id} setReschedule={setReschedule}
+            resetForm={resetForm} setActiveUpdateModal={setActiveModal} handleEdit={handleEdit} 
+            handleDelete={handleDelete}
+          />
+               
+          
+          ))}
+        </div>
+      )}
+
+      {activeModal && (
+        <div>
+          <Modal
+            isOpen={activeModal}
+            onClose={() => setActiveModal(false)}
+            showCloseButton={false}
+          >
+            {/* FORMULAIRE */}
+            <div className="bg-white shadow-xl  rounded-2xl p-5 space-y-4">
+              <h2 className="text-xl font-semibold">{getTitle()}</h2>
+
+              <Input
+                value={form.name}
+                type="text"
+                placeholder="Titre"
+                onChange={(e) => handleChange("name", e.target.value)}
               />
-            )}
 
-            <div className="p-4 space-y-2">
-              <h3 className="font-semibold text-lg">{event.title}</h3>
-              <p className="text-sm text-gray-500">{event.description}</p>
+              <Input
+                value={form.amount}
+                type="number"
+                placeholder="Montant"
+                onChange={(e) => handleChange("amount", e.target.value)}
+              />
 
-              <div className="text-xs text-gray-400">
-                📍 {event.location} • 📅 {event.date?.slice(0, 10)}
-              </div>
+              <Input
+                value={form.description}
+                type="text-area"
+                placeholder="Description"
+                onChange={(e) => handleChange("description", e.target.value)}
+              />
 
-              <div className="flex gap-2 pt-2">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleEdit(event);
-                  }}
-                  className="text-blue-500 text-sm"
-                >
-                  Modifier
-                </button>
+              <Input
+                value={form.phoneNumber}
+                type="tel"
+                placeholder="Numero"
+                onChange={(e) => handleChange("phoneNumber", e.target.value)}
+              />
+             
+              {/* ORANGE_MONEY
+                MTN_MOMO
+                MOOV_MONEY
+                WAVE
+                CASH
+                BANK */}
+              <Input
+                value={form.method}
+                type="text"
+                placeholder="Methode"
+                onChange={(e) => handleChange("method", e.target.value)}
+              />
 
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete(event.id);
-                  }}
-                  className="text-red-500 text-sm"
-                >
-                  Supprimer
-                </button>
+              <div className="flex gap-2">
+                <Button onClick={handleSubmit}>{submitTitle()}</Button>
+
+                {reschedule && (
+                  <Button onClick={resetForm} variant="secondary">
+                    Annuler
+                  </Button>
+                )}
               </div>
             </div>
-          </div>
-        ))}
+          </Modal>
         </div>
-    )}
+      )}
     </div>
   );
 };

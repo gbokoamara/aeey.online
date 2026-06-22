@@ -1,82 +1,125 @@
-
-import { API_CONFIG } from "../config/api";
-import axios from "axios"
-import { logData } from "../utils/console";
-import { useLocalStorage } from "./useLocalStorage";
 import { useState } from "react";
+import { useLocalStorage } from "./useLocalStorage";
 import { useRedirect } from "./useNavigate";
 import { userOnLocal } from "../helper/getUser";
+import { API_CONFIG } from "../config/api";
+import axios from "axios";
+import { logData } from "../utils/console";
 
-export const useUser = () => {
-    const [ loading, setLoading ] = useState(false);
-    const {setItem, removeItem} = useLocalStorage();
-    const redirect = useRedirect();
-    const user = userOnLocal();
-    const userId = user.id;
-    
+export const useCard = () => {
+  const [loading, setLoading] = useState(false);
+  const [cards, setCards] = useState([]);
+  const [card, setCard] = useState(null);
+  const [error, setError] = useState(null);
+  const { setItem } = useLocalStorage();
+  const redirect = useRedirect();
+  const user = userOnLocal();
+  const userId = user?.id;
 
-    const getAllCard = async () => {
-        setLoading(true)
-        try {
-            const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CARD.GET}/${userId}`
-            logData("fetchUrl", url)
-            const response = await axios.post(url)
-            logData("response on update", response)
-            const allCards = response?.data?.allCards
-            logData("allCards on login", allCards)
-            // setItem("user", user)
-            return allCards
-        } catch (error) {
-            console.error("login error", error)
-        } finally {
-            setLoading(false)
-        }
-        
+  const getAllCard = async () => {
+    setLoading(true);
+    try {
+      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CARD.GET_ALL}`;
+      const response = await axios.get(url);
+      const allCards = response?.data?.allCards;
+      setItem("allCards", allCards);
+      setCards(allCards);
+    } catch (error) {
+      console.error("getAllCard error", error);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    const memberRequest = async (password, userId) => {
-        setLoading(true)
-        try {
-            const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AUTH.PASSWORD}/${userId}`
-            logData("passUrl", url)
-            const response = await axios.put(url, {password})
-            logData("response on pass", response)
-            const user = response?.data?.user
-            logData("userData on pass", user)
-            setItem("user", user)
-            return user
-        } catch (error) {
-            console.error("login error", error)
-        } finally {
-            setLoading(false)
-        }
-        
-    };
+  const getAllRequestCard = async () => {
+    setLoading(true);
+    try {
+      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CARD.GET_ALL_REQUEST}`;
+      const response = await axios.get(url);
+      const allCards = response?.data?.allCards;
+      setItem("allCards", allCards);
+      setCards(allCards);
+    } catch (error) {
+      console.error("getAllRequestCard error", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const cardRequest = async (password, userId) => {
-            logData("password", password)
-            logData("userId", userId)
+  const getRequestCard = async (userId) => {
+    setLoading(true);
+    try {
+      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CARD.GET_REQUEST}/${userId}`;
+      const response = await axios.get(url); // ✅ corrigé
+      const card = response?.data?.card;
+      setItem("card", card);
+      setCard(card);
+    } catch (error) {
+      console.error("getRequestCard error", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        setLoading(true)
-        try {
-            const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AUTH.VERIFY_PASSWORD}/${userId}`
-            logData("passUrl", url)
-            const response = await axios.post(url, {password})
-            logData("response on pass", response)
-            const isMatch = response?.data?.isMatch
-            logData("userData on pass", isMatch)
-            // setItem("user", user)
-            return isMatch
-        } catch (error) {
-            console.error("login error", error)
-        } finally {
-            setLoading(false)
-        }
-        
-    };
+  const requestCard = async (cardData) => {
+    setLoading(true);
+    try {
+      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CARD.REQUEST_CARD}/${userId}`;
+      const response = await axios.post(url, { cardData });
+      logData("response", response)
+      const requestedCard = response?.data?.card;
+      setCard(requestedCard);
+      return requestedCard
+    } catch (error) {
+      const message = error?.response?.data?.message || "Erreur inconnue";
+      // console.error("requestCard error", error);
+      logData("error", message)
+      setError(message)
+      return { success: false, message };
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    
+  const updateCard = async (updateCardData, userId) => {
+    setLoading(true);
+    try {
+      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CARD.UPDATE_CARD}/${userId}`;
+      const response = await axios.put(url, { updateCardData });
+      const card = response?.data?.card;
+      setItem("card", card);
+      setCard(card);
+    } catch (error) {
+      console.error("updateCard error", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    return {update, memberRequest, cardRequest};
-}
+  const deleteCard = async (userId) => {
+    setLoading(true);
+    try {
+      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CARD.DELETE}/${userId}`;
+      const response = await axios.delete(url);
+      return response?.data?.message;
+    } catch (error) {
+      console.error("deleteCard error", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  return {
+    card,
+    error,
+    cards,
+    userId,
+    loading,
+    getAllCard,
+    updateCard,
+    deleteCard,
+    requestCard,
+    getRequestCard,
+    getAllRequestCard,
+  };
+};

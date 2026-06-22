@@ -9,6 +9,7 @@ import BackButton from "../utils/backButton";
 import { useAppNavigation } from "../hooks/useAppNavigation";
 import CarteMembreAEEY from "../component/membres/Carte/CarteMembreAEEY";
 import { userOnLocal } from "../helper/getUser";
+import { useCard } from "../hooks/useCard";
 
 
 export const CardPage = () => {
@@ -16,23 +17,30 @@ export const CardPage = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [photo, setPhoto] = useState(null);
-
+  const [number, setNumber] = useState(null);
   const [member, setMember] = useState(null);
   const [showCard, setShowCard] = useState(false);
 
   const { goTo } = useAppNavigation();
+  const { card, error, getRequestCard, requestCard } = useCard()
 
   const nomComplet = `${firstName} ${lastName}`.trim();
   console.log("nom :=>", nomComplet)
+
+  const cardData = {firstName, lastName, number, photo}
+
   // 🔎 Recherche du membre + affichage carte
-  const handleShowCard = () => {
+  const handleShowCard = async () => {
 
-    // setMember(found);
-    setShowCard(true);
+    const requestedCard = await requestCard(cardData)
+    if (requestedCard) {
+       setShowCard(true);
+    }
+    await getRequestCard()
   };
-
   // 💳 Aller vers paiement
   const handleSubmit = () => {
+    
     goTo("/paiement", {
       state: {
         member: {firstName, lastName},
@@ -44,9 +52,11 @@ export const CardPage = () => {
 
   useEffect(() => {
   if (user) {
+    setNumber(user.number || "");
     setFirstName(user.firstName || "");
     setLastName(user.lastName || "");
     setPhoto(user.photo || null);
+    // getRequestCard(user.id)
   }
 }, [user]);
 
@@ -61,6 +71,13 @@ export const CardPage = () => {
       <ImageUpload onImageSelect={setPhoto} />
 
       {/* INPUTS */}
+      <Input
+        type="tel"
+        placeholder="Numero"
+        value={number}
+        onChange={(e) => setFirstName(e.target.value)}
+      />
+
       <Input
         type="text"
         placeholder="Nom"
@@ -82,7 +99,9 @@ export const CardPage = () => {
           onClick={handleShowCard}
         />
       )}
-
+      { error && (
+        <p className="text-red-500">{error} </p>
+      )}
       {/* CARTE + PAIEMENT */}
       {showCard &&  (
         <div className="flex flex-col gap-3 items-center">
@@ -92,11 +111,7 @@ export const CardPage = () => {
           </h1>
 
           <div className="w-[320px] h-50">
-            <CarteMembreAEEY
-              nom={firstName}
-              prenoms={lastName}
-              photo={photo}
-            />
+            <CarteMembreAEEY/>
           </div>
 
           <Button

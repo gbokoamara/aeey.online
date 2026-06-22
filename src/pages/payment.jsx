@@ -4,12 +4,23 @@ import Input from "../utils/input";
 import Button from "../utils/button";
 import { useAppNavigation } from "../hooks/useAppNavigation";
 import { userOnLocal } from "../helper/getUser";
+import { usePayment } from "../hooks/usePayment";
 
 export const PaymentPage = () => {
   const [initialized, setInitialized] = useState(false);
   const [type, setType] = useState("member"); // member | other | guest | carte
   // const [user, setUser] = useState("member");
   const { getState, goTo } = useAppNavigation()
+  const {
+        error,
+        loading,
+        payment,
+        payments,
+        addPayment,
+        getPayment, 
+        getAllPayments,
+        } = usePayment();
+
   const state = getState()
   const user = userOnLocal();
   const isFromState = !!state?.member;
@@ -130,9 +141,10 @@ const getArticleType = () => {
       ],
     };
 
-    
-    console.log(paymentData);
-    goTo("/home", { state: state})
+    addPayment(paymentData)
+    getAllPayments()
+    console.log(payments);
+    // goTo("/home", { state: state})
   };
 
   return (

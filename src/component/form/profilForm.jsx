@@ -9,34 +9,37 @@ import { logData } from "../../utils/console";
 
 export const UpdateForm = ({ handleValidate, title }) => {
   const user = userOnLocal();
-  const member = memberOnLocal()
+  const member = memberOnLocal();
   const redirect = useRedirect();
   const [step, setStep] = useState(0);
-  const finalUser = user ? user : member
+  const finalUser = user ? user : member;
   const [photo, setPhoto] = useState(user.photo || null);
-  
+
   const [form, setForm] = useState({
     firstName: finalUser.firstName || "",
     lastName: finalUser.lastName || "",
-    dateNaissance: finalUser.birthDate ? finalUser.birthDate.split('T')[0] : "",
+    dateNaissance: finalUser.birthDate ? finalUser.birthDate.split("T")[0] : "",
     sex: finalUser.sex || "",
     telephone: finalUser.number || "",
     email: finalUser.email || "",
     city: finalUser.city || "",
-    address: finalUser.address ||"",
+    address: finalUser.address || "",
 
     etablissement: finalUser.etablissement || "",
     niveau: finalUser.niveau || "",
     filiere: finalUser.filiere || "",
-    matricule: finalUser.matricule ||  "",
+    matricule: finalUser.matricule || "",
 
+    profession: finalUser.profession || "",
     occupation: finalUser.occupation || "",
     entreprise: finalUser.entreprise || "",
     document: finalUser.document || null,
     dejaMembre: false,
-    numeroMembre:  finalUser.numeroMembre || "",
+    numeroMembre: finalUser.numeroMembre || "",
     section: finalUser.section || "",
     certifie: false,
+    poste: finalUser.poste || "",
+    memberType: finalUser.memberType || "",
     statut: finalUser.memberStatus || "", // en_attente | refuse | valide
   });
 
@@ -62,9 +65,9 @@ export const UpdateForm = ({ handleValidate, title }) => {
   };
 
   const handleSubmit = () => {
-    logData("form", form)
-    handleValidate(form)
-  }
+    logData("form", form);
+    handleValidate(form);
+  };
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-md w-full max-w-md space-y-4">
@@ -188,32 +191,6 @@ export const UpdateForm = ({ handleValidate, title }) => {
             onChange={(e) => handleChange("matricule", e.target.value)}
           />
 
-          <div className="flex justify-between gap-1">
-            <Button children="Retour" onClick={prevStep} />
-            <Button children="Suivant" onClick={nextStep} />
-          </div>
-        </>
-      )}
-
-      {/* ---------------- STEP 3 ---------------- */}
-      {step === 3 && (
-        <>
-          <p className="font-semibold">Justificatif (carte scolaire ou cni) </p>
-
-          <Input
-            type="text"
-            placeholder="occupation"
-            value={form.occupation}
-            onChange={(e) => handleChange("occupation", e.target.value)}
-          />
-
-          <Input
-            type="text"
-            placeholder="entreprise"
-            value={form.entreprise}
-            onChange={(e) => handleChange("entreprise", e.target.value)}
-          />
-
           <Input
             type="file"
             onChange={(e) => handleChange("document", e.target.files[0])}
@@ -226,10 +203,72 @@ export const UpdateForm = ({ handleValidate, title }) => {
         </>
       )}
 
+      {/* ---------------- STEP 3 ---------------- */}
+      {step === 3 && (
+        <>
+          <p className="font-semibold">Justificatif (carte scolaire ou cni) </p>
+
+          <label className="flex items-center gap-2 text-sm">
+            {" "}
+            statut social{" "}
+          </label>
+          <select
+            name="memberType"
+            id="memberType"
+            className="w-full p-2 border rounded-md" // Ajoute tes classes de style ici
+            value={form.memberType}
+            onChange={(e) => handleChange("memberType", e.target.value)}
+          >
+            <option value="">Sélectionnez un statut</option>
+            <option value="ELEVE">ELEVE</option>
+            <option value="ETUDIANT">ETUDIANT</option>
+            <option value="PROFESSIONNEL">PROFESSIONNEL</option>
+          </select>
+
+          {/* On affiche ces champs UNIQUEMENT si le type est PROFESSIONNEL */}
+          {form.memberType === "PROFESSIONNEL" && (
+            <>
+              <Input
+                type="text"
+                placeholder="Métier"
+                value={form.profession}
+                onChange={(e) => handleChange("profession", e.target.value)}
+              />
+
+              <Input
+                type="text"
+                placeholder="Poste en entreprise"
+                value={form.occupation}
+                onChange={(e) => handleChange("occupation", e.target.value)}
+              />
+
+              <Input
+                type="text"
+                placeholder="Entreprise"
+                value={form.entreprise}
+                onChange={(e) => handleChange("entreprise", e.target.value)}
+              />
+            </>
+          )}
+
+          <div className="flex justify-between gap-1">
+            <Button children="Retour" onClick={prevStep} />
+            <Button children="Suivant" onClick={nextStep} />
+          </div>
+        </>
+      )}
+
       {/* ---------------- STEP 4 ---------------- */}
       {step === 4 && (
         <>
           <p className="font-semibold">Lien avec l'association</p>
+
+          <Input
+            type="text"
+            placeholder="Poste dans à l'AEEY"
+            value={form.poste}
+            onChange={(e) => handleChange("poste", e.target.value)}
+          />
 
           <Input
             type="text"

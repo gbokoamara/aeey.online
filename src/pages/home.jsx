@@ -7,7 +7,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import CarteMembreAEEY from "../component/membres/Carte/CarteMembreAEEY";
 import IconNav from "../component/services/nav";
 // import PaymentList from '../component/membres/payment/Payment'
-import { payments } from "../data/payment";
+// import { payments } from "../data/payment";
 import { useAppNavigation } from "../hooks/useAppNavigation";
 import PaymentList from "../component/payments/Payment";
 import { useLocalStorage } from "../hooks/useLocalStorage";
@@ -18,6 +18,7 @@ import { useAuth } from "../hooks/useAuth";
 import { userOnLocal } from "../helper/getUser";
 import { Events } from "../component/events/events";
 import { AutoScroll } from "../utils/autoScroll";
+import { usePayment } from "../hooks/usePayment";
 
 export const HomePage = () => {
   const [showCreatePin, setShowCreatePin] = useState(false);
@@ -30,7 +31,21 @@ export const HomePage = () => {
   const user = userOnLocal();
   const { createPin } = useAuth();
   logData("userData at home", user);
+    const {
+        error,
+        loading,
+        payment,
+        payments,
+        addPayment,
+        getPayment, 
+        getAllPayments,
+        } = usePayment()
 
+
+  useEffect(() => {
+    getAllPayments()
+  }, [])
+  
   useEffect(() => {
     if (user && user.havePass === false) {
       setShowCreatePin(true);

@@ -10,8 +10,8 @@ export const useEvent = () => {
   const [loading, setLoading] = useState(false);
   const { setItem, removeItem } = useLocalStorage();
   const redirect = useRedirect();
-  const [events, setEvents] = useState(false);
-  const [event, setEvent] = useState(false);
+  const [events, setEvents] = useState([]);
+  const [event, setEvent] = useState(null);
   // const events = EventsOnLocal();
   // const userId = user.id;
 

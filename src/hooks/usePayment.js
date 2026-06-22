@@ -7,76 +7,85 @@ import { useState } from "react";
 import { useRedirect } from "./useNavigate";
 import { userOnLocal } from "../helper/getUser";
 
-export const useUser = () => {
+export const usePayment = () => {
     const [ loading, setLoading ] = useState(false);
+    const [ error, setError ] = useState(null);
+    const [ payment, setPayment ] = useState(null);
+    const [ payments, setPayments ] = useState([]);
     const {setItem, removeItem} = useLocalStorage();
     const redirect = useRedirect();
     const user = userOnLocal();
     const userId = user.id;
     
 
-    const update = async (updateDate) => {
+    const addPayment = async (addData) => {
         setLoading(true)
         try {
-            const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.USER.UPDATE}/${userId}`
+            const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PAYMENT.ADD}/${userId}`
             logData("fetchUrl", url)
-            const response = await axios.post(url, {updateDate})
-            logData("response on update", response)
-            const user = response?.data?.user
-            logData("userData on login", user)
-            // setItem("user", user)
-            // return user
+            const response = await axios.post(url, {addData})
+            logData("response on add", response)
+            const payment = response?.data?.payment
+            logData("paymentData on login", payment)
+            setItem("payment", payment)
+            setPayment(payment)
         } catch (error) {
             console.error("login error", error)
+            setError(error)
         } finally {
             setLoading(false)
         }
         
     }
 
-    const memberRequest = async (password, userId) => {
+    const getPayment = async (paymentId) => {
         setLoading(true)
         try {
-            const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AUTH.PASSWORD}/${userId}`
+            const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PAYMENT.GET}/${paymentId}`
             logData("passUrl", url)
-            const response = await axios.put(url, {password})
+            const response = await axios.get(url)
             logData("response on pass", response)
-            const user = response?.data?.user
-            logData("userData on pass", user)
-            setItem("user", user)
-            return user
+            const payment = response?.data?.payment
+            logData("paymentData on pass", payment)
+            setItem("payment", payment)
+            setPayment(payment)
         } catch (error) {
+            setError(error)
             console.error("login error", error)
         } finally {
             setLoading(false)
         }
-        
     };
 
-    const cardRequest = async (password, userId) => {
-            logData("password", password)
-            logData("userId", userId)
-
+    const getAllPayments = async () => {
         setLoading(true)
         try {
-            const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AUTH.VERIFY_PASSWORD}/${userId}`
+            const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PAYMENT.GET_ALL}`
             logData("passUrl", url)
-            const response = await axios.post(url, {password})
+            const response = await axios.get(url)
             logData("response on pass", response)
-            const isMatch = response?.data?.isMatch
-            logData("userData on pass", isMatch)
-            // setItem("user", user)
-            return isMatch
+            const payments = response?.data?.payments
+            logData("paymentsData on pass", payments)
+            setItem("payments", payments)
+            setPayments(payments)
         } catch (error) {
+            setError(error)
             console.error("login error", error)
         } finally {
             setLoading(false)
         }
-        
     };
 
     
 
-    return {update, memberRequest, cardRequest};
+    return {
+        error,
+        loading,
+        payment,
+        payments,
+        addPayment,
+        getPayment, 
+        getAllPayments,
+        };
 }
 

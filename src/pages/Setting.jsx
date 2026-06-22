@@ -17,6 +17,7 @@ import { logData } from "../utils/console";
 import { userOnLocal } from "../helper/getUser";
 import { AddEvent } from "../component/events/eventForm";
 import { ExpensePage } from "../component/expenses/ExpensesComponent";
+import { CardAdministration } from "../component/cards/CardAdministration";
 
 export const SettingPage = () => {
   const {logout} = useAuth()
@@ -71,7 +72,9 @@ export const SettingPage = () => {
       case "events":
         return <AddEvent />;
       case "expenses":
-        return <ExpensePage />;  
+        return <ExpensePage />;
+      case "Card":
+        return <CardAdministration />;  
       default:
         return null;
     }
@@ -173,6 +176,11 @@ export const SettingPage = () => {
               <Button
                 children="Gestion des dépenses"
                 onClick={() => handleClick("expenses")}
+              />
+
+              <Button
+                children="Gestion des carteS"
+                onClick={() => handleClick("Card")}
               />
 
             </div>

@@ -1,21 +1,38 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { pendingMembers } from "../../../data/payment";
+import { useMember } from "../../../hooks/useMember";
+import { logData } from "../../../utils/console";
 
 export const ValidateMemberPage = () => {
-  const [members, setMembers] = useState(pendingMembers);
+  const {
+    loading,
+    member,
+    members,
+    updatemember,
+    getAllmembers,
+    getmember,
+    deletemember,
+    getPendingMembers,
+  } = useMember()
+  // const [members, setMembers] = useState(pendingMembers);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
+  logData("members",members)
+  // const members = members.filter(m => !m.isMember);
 
-  const pendingList = members.filter(m => !m.isMember);
+  useEffect(() =>{
+    getAllmembers()
+    getPendingMembers()
+  }, [])
 
   const handleOpenModal = () => {
-    if (pendingList.length === 0) return;
+    if (members.length === 0) return;
     setCurrentIndex(0);
     setIsOpen(true);
   };
 
   const handleValidate = () => {
-    const memberToValidate = pendingList[currentIndex];
+    const memberToValidate = members[currentIndex];
 
     const updatedMembers = members.map(m =>
       m.id === memberToValidate.id
@@ -26,7 +43,7 @@ export const ValidateMemberPage = () => {
     setMembers(updatedMembers);
 
     // passer au suivant
-    if (currentIndex + 1 < pendingList.length) {
+    if (currentIndex + 1 < members.length) {
       setCurrentIndex(currentIndex + 1);
     } else {
       setIsOpen(false); // fini
@@ -69,17 +86,17 @@ export const ValidateMemberPage = () => {
       </div>
 
       {/* BOUTON */}
-      {pendingList.length > 0 && (
+      {members.length > 0 && (
         <button
           onClick={handleOpenModal}
           className="fixed bottom-4   bg-black text-white py-3 rounded-xl w-90 md:w-4xl "
         >
-          Valider ({pendingList.length})
+          Valider ({members.length})
         </button>
       )}
 
       {/* MODAL */}
-      {isOpen && pendingList[currentIndex] && (
+      {isOpen && members[currentIndex] && (
         <div className="fixed inset-0 bg-black/50 flex items-end justify-center">
           <div className="bg-white w-full rounded-t-2xl p-4 md:w-6xl ">
             <h2 className="text-lg font-semibold mb-3">
@@ -89,16 +106,16 @@ export const ValidateMemberPage = () => {
             <div className="space-y-2">
               <p>
                 <strong>Nom:</strong>{" "}
-                {pendingList[currentIndex].firstName}{" "}
-                {pendingList[currentIndex].lastName}
+                {members[currentIndex].firstName}{" "}
+                {members[currentIndex].lastName}
               </p>
               <p>
                 <strong>Téléphone:</strong>{" "}
-                {pendingList[currentIndex].number}
+                {members[currentIndex].number}
               </p>
               <p>
                 <strong>Statut:</strong>{" "}
-                {pendingList[currentIndex].satisfiestatut}
+                {members[currentIndex].satisfiestatut}
               </p>
             </div>
 
