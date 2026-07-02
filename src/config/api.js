@@ -58,6 +58,7 @@ export const API_CONFIG = {
             ADD: "/payment/add",
             GET: "/payment/get",
             GET_ALL: "/payment/get-all",
+            STAT: "/payment/get-stat",
 
          }
     }

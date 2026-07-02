@@ -5,6 +5,8 @@ import { useAuth } from "../hooks/useAuth";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import { logData } from "../utils/console";
 import { Modal } from "../utils/Modal";
+import { usePayment } from "../hooks/usePayment";
+import { formatNumber } from "../helper/formatNumber";
 
 const Header = () => {
   const { verifyPin } = useAuth();
@@ -14,6 +16,11 @@ const Header = () => {
   const [isUnlocked, setIsUnlocked] = useState(false);
   const { getItem } = useLocalStorage();
   const user = getItem("user");
+  const {stats, getPaymentStat} = usePayment()
+  logData("stats", stats)
+  useEffect(() => {
+    getPaymentStat()
+  }, [])
 
   const timeoutRef = useRef(null); // pour gérer le timer
 
@@ -85,7 +92,7 @@ const Header = () => {
           <div className="font-semibold text-2xl">
             {showBalance ? (
               <>
-                35 000 <span className="text-sm">F CFA</span>
+               {stats ? formatNumber(stats?.totalAmount) : "35 000"}  <span className="text-sm">F CFA</span>
               </>
             ) : (
               "•••••••••"

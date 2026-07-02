@@ -12,7 +12,9 @@ export const usePayment = () => {
     const [ error, setError ] = useState(null);
     const [ payment, setPayment ] = useState(null);
     const [ payments, setPayments ] = useState([]);
+    const [ stats, setStats ] = useState(null);
     const {setItem, removeItem} = useLocalStorage();
+    
     const redirect = useRedirect();
     const user = userOnLocal();
     const userId = user.id;
@@ -29,6 +31,7 @@ export const usePayment = () => {
             logData("paymentData on login", payment)
             setItem("payment", payment)
             setPayment(payment)
+            return payment
         } catch (error) {
             console.error("login error", error)
             setError(error)
@@ -76,9 +79,27 @@ export const usePayment = () => {
         }
     };
 
-    
+    const getPaymentStat = async () => {
+        setLoading(true)
+        try {
+            const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PAYMENT.STAT}`
+            logData("passUrl", url)
+            const response = await axios.get(url)
+            logData("response on pass", response)
+            const stats = response?.data?.stats
+            logData("statsData on hooks", stats)
+            setItem("stats", stats)
+            setStats(stats)
+        } catch (error) {
+            setError(error)
+            console.error("login error", error)
+        } finally {
+            setLoading(false)
+        }
+    };
 
     return {
+        stats,
         error,
         loading,
         payment,
@@ -86,6 +107,7 @@ export const usePayment = () => {
         addPayment,
         getPayment, 
         getAllPayments,
+        getPaymentStat,
         };
 }
 

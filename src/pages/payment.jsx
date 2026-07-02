@@ -2,15 +2,19 @@ import { useEffect, useState } from "react";
 import BackButton from "../utils/backButton";
 import Input from "../utils/input";
 import Button from "../utils/button";
+import SubmitButton from "../utils/submit"
 import { useAppNavigation } from "../hooks/useAppNavigation";
 import { userOnLocal } from "../helper/getUser";
 import { usePayment } from "../hooks/usePayment";
+import { logData } from "../utils/console";
+import { makePayment } from "../config/fusionPay";
 
 export const PaymentPage = () => {
   const [initialized, setInitialized] = useState(false);
   const [type, setType] = useState("member"); // member | other | guest | carte
   // const [user, setUser] = useState("member");
   const { getState, goTo } = useAppNavigation()
+  // logData("url", payinUrl)
   const {
         error,
         loading,
@@ -24,12 +28,13 @@ export const PaymentPage = () => {
   const state = getState()
   const user = userOnLocal();
   const isFromState = !!state?.member;
-  console.log("state :=>", state)
-  console.log("user :=>", user)
+  // console.log("state :=>", state)
+  // console.log("user :=>", user)
 
   const [form, setForm] = useState({
-    name: "",
+    firstName: "",
     number: "",
+    otherNumber: "",
     amount: "",
   });
 
@@ -74,7 +79,7 @@ const getArticleType = () => {
     setType("carte");
 
     setForm({
-      name: state.member.firstName || "",
+      firstName: state.member.firstName || "",
       number: state.member.number || "",
       amount: state.montant || "",
     });
@@ -89,7 +94,7 @@ const getArticleType = () => {
   if (type === "member") {
   
     setForm({
-      name: user.firstName || "",
+      firstName: user.firstName || "",
       number: user.number || "",
       amount: user.montant || "",
     });
@@ -100,6 +105,7 @@ const getArticleType = () => {
     setForm({
       firstName: "",
       number: "",
+      otherNumber:"",
       amount: "",
     });
   }
@@ -116,8 +122,16 @@ const getArticleType = () => {
     } 
     console.log("auteur", author);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (
+    !form.firstName.trim() ||
+    !form.number.trim() ||
+    !form.amount
+  ) {
+    return alert("Veuillez remplir tous les champs obligatoires.");
+  }
     const articleType = getArticleType()
+    const domain = import.meta.env.VITE_CLIENT_URL
     
     const paymentData = {
       totalPrice: Number(form.amount),
@@ -130,21 +144,30 @@ const getArticleType = () => {
 
       numeroSend: form.number.trim(),
       nomclient: form.firstName,
+      return_url: `${domain}`,// return_url: `${domain}/callback`, à personaliser selon le type de paiement( carte, cautisation...)
+      webhook_url: `${domain}/webhook-url`,
 
       personal_Info: [
         {
           type,
           article: articleType,
-          auteur: author
+          auteur: author,
+          otherNumber: form.otherNumber
 
         },
       ],
     };
 
-    addPayment(paymentData)
-    getAllPayments()
+    const added = await addPayment(paymentData)
+    await getAllPayments()
     console.log(payments);
     // goTo("/home", { state: state})
+    if (added) {
+      const response = await makePayment(paymentData)
+      if (response) {
+        window.location.href = response.url
+      }
+    }
   };
 
   return (
@@ -196,11 +219,19 @@ const getArticleType = () => {
           onChange={(e) => handleChange("firstName", e.target.value)}
           disabled={type === "member"}
         />
-
+        {type === "other" &&(
+          <Input
+          type="tel"
+          placeholder="Numero tierce"
+          value={form.otherNumber}
+          onChange={(e) => handleChange("otherNumber", e.target.value)}
+          // disabled={type === "member"}
+        />
+        )}
         {/* NUMÉRO */}
         <Input
           type="tel"
-          placeholder="Téléphone"
+          placeholder="Numero à debiter "
           value={form.number}
           onChange={(e) => handleChange("number", e.target.value)}
           disabled={type === "member"}
@@ -214,7 +245,13 @@ const getArticleType = () => {
           onChange={(e) => handleChange("amount", e.target.value)}
         />
 
-        <Button children="Payer" onClick={handleSubmit} />
+        <SubmitButton 
+        // className="bg-amber-300"
+        // type="submit"
+        loading={loading} 
+        Chargement= "Enregistrement en cours ..."
+        children="Enregistrer" 
+        onClick={handleSubmit} />
 
       </div>
     </div>

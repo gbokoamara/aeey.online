@@ -52,6 +52,7 @@ export const useCard = () => {
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CARD.GET_REQUEST}/${userId}`;
       const response = await axios.get(url); // ✅ corrigé
       const card = response?.data?.card;
+      // logData("card on hook", card)
       setItem("card", card);
       setCard(card);
     } catch (error) {

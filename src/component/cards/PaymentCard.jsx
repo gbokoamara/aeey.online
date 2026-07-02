@@ -11,7 +11,7 @@ export const PaymentCard = ({ payment }) => {
         className="grid grid-cols-2 md:grid-cols-3 p-1 md:p-3 rounded-lg bg-slate-100  hover:bg-gray-100 transition w-full  md:justify-around"
       >
         <div className="col-span-1 text-start">
-          <p className="font-semibold ">{capitalize(payment?.name)}</p>
+          <p className="font-semibold ">{capitalize(payment?.name || "carte")}</p>
           {/* <p className="text-sm text-gray-500 md:hidden">{payment?.date}</p> */}
         </div>
 

@@ -40,7 +40,7 @@ export const LoginPage = () => {
         <div className='flex flex-col gap-10 text-center bg-amber-50 text-black h-full w-full justify-center items-center md:w-3xl md:h-96 rounded-2xl'>
           <div className='grid gap-5 '>
             <h1>bienvenue chez A.E.E.Y !</h1>
-            <p>Pour commencer, entrez votre nom et votre numero mobile.</p>
+            <p>Pour commencer, entrez votre numero de téléphone.</p>
           </div>
           {/* <div>
             <Input type={"text"} placeholder={"Nom"}  onChange={(e)=> setName(e.target.value)} />
