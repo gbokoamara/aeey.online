@@ -9,7 +9,7 @@ import { Link } from "react-router-dom";
 import { useCotisation } from "../../hooks/useCotisation";
 import { dateUi } from "../../helper/date";
 import { capitalize } from "../../helper/Capitalizer";
-import { CotisationCard } from "./cotisationCard";
+import { CotisationCard } from "./CotisationCard";
 
 export const Cotisation = () => {
   const [activeModal, setActiveModal] = useState(false);
