@@ -6,7 +6,7 @@ import { logData } from "../../utils/console";
 
 
 const PaymentList = ({payments}) => {
-logData("payments", payments)
+// logData("payments", payments)
   return (
     <div className="grid gap-3 py-3 ">
       {payments.map((payment) => (

@@ -8,13 +8,34 @@ import { userOnLocal } from "../helper/getUser";
 import { usePayment } from "../hooks/usePayment";
 import { logData } from "../utils/console";
 import { makePayment } from "../config/fusionPay";
+import { useCotisation } from "../hooks/useCotisation";
+
+const COTISATIONS = [
+  {
+    id: "adhesion",
+    nom: "Adhésion",
+    montant: 5000,
+  },
+  {
+    id: "mensuelle",
+    nom: "Cotisation mensuelle",
+    montant: 1000,
+  },
+  {
+    id: "annuelle",
+    nom: "Cotisation annuelle",
+    montant: 12000,
+  },
+  {
+    id: "exceptionnelle",
+    nom: "Cotisation exceptionnelle",
+    montant: 3000,
+  },
+];
 
 export const PaymentPage = () => {
   const [initialized, setInitialized] = useState(false);
-  const [type, setType] = useState("member"); // member | other | guest | carte
-  // const [user, setUser] = useState("member");
   const { getState, goTo } = useAppNavigation()
-  // logData("url", payinUrl)
   const {
         error,
         loading,
@@ -24,26 +45,44 @@ export const PaymentPage = () => {
         getPayment, 
         getAllPayments,
         } = usePayment();
+  const {
+      // loading,
+      cotisation,
+      cotisations,
+      getCotisations,
+      getCotisation,
+    } = useCotisation();
+  
+  useEffect(() =>{
+    getCotisations()
+  },[])
 
   const state = getState()
+  const [type, setType] = useState(() => state?.type || "member");
   const user = userOnLocal();
   const isFromState = !!state?.member;
-  // console.log("state :=>", state)
-  // console.log("user :=>", user)
+  const isFixedType = !!state?.type;
+  console.log("state :=>", state)
 
   const [form, setForm] = useState({
-    firstName: "",
-    number: "",
-    otherNumber: "",
-    amount: "",
-  });
-
-  //  NOM ARTICLE DYNAMIQUE
+      firstName: "",
+      number: "",
+      otherNumber: "",
+      paymentFor: "self", // self | other
+      amount: "",
+      cardId: "",
+      cotisationId: "",
+      eventId: "",
+    });
+  
   const getArticleName = (type) => {
-
   switch (type) {
     case "member":
       return "Je paie ma cotisation";
+    case "cautisation":
+      return "Je paie ma cotisation";
+    case "event":
+      return "Je participe pour : ";
     case "carte":
       return "J'achète ma carte membre";
     case "other":
@@ -72,66 +111,106 @@ const getArticleType = () => {
   }
 };
 
-  //  AUTO-REMPLISSAGE MEMBRE
- useEffect(() => {
-  // appliquer le state UNE SEULE FOIS
-  if (isFromState && !initialized) {
-    setType("carte");
+useEffect(() => {
+  if (initialized) return;
 
+  if (type === "carte") {
     setForm({
-      firstName: state.member.firstName || "",
-      number: state.member.number || "",
-      amount: state.montant || "",
+      firstName: state?.member?.firstName || "",
+      number: state?.member?.number || "",
+      amount: state?.montant || "",
+      cardId: state?.card?.id || "",
+      otherNumber: "",
+      cotisationId: "",
+      eventId: "",
     });
 
     setInitialized(true);
     return;
   }
 
-  // comportement normal après
-  if (!initialized) return;
-
-  if (type === "member") {
-  
+  if (type === "event") {
     setForm({
       firstName: user.firstName || "",
       number: user.number || "",
-      amount: user.montant || "",
+      amount: state?.amount || "",
+      eventId: state?.eventId,
+      otherNumber: "",
+      cardId: "",
+      cotisationId: "",
     });
+
+    setInitialized(true);
+    return;
   }
 
+  if (type === "member") {
+    setForm({
+      firstName: user.firstName || "",
+      number: user.number || "",
+      amount: "",
+      otherNumber: "",
+      cardId: "",
+      cotisationId: "",
+    });
+
+    setInitialized(true);
+    return;
+  }
 
   if (type === "guest") {
     setForm({
       firstName: "",
       number: "",
-      otherNumber:"",
       amount: "",
+      otherNumber: "",
+      cardId: "",
+      cotisationId: "",
     });
+
+    setInitialized(true);
   }
+}, [type]);
 
-}, [type, state, initialized]);
-
+  // const handleChange = (field, value) => { setForm({ ...form, [field]: value });};
   const handleChange = (field, value) => {
-    setForm({ ...form, [field]: value });
+    if (field === "cotisationId") {
+      const cotisation = cotisations.find(c => c.id === value);
+
+      setForm(prev => ({
+        ...prev,
+        cotisationId: value,
+        amount: cotisation ? cotisation.amount : "",
+      }));
+
+      return;
+    }
+
+    setForm(prev => ({
+      ...prev,
+      [field]: value,
+    }));
   };
 
   let author = null
-    if (type === "other") {
-     author = user
-    } 
-    console.log("auteur", author);
+  if (type === "other") { author = user.firstName} 
+    // console.log("auteur", author);
 
   const handleSubmit = async () => {
-    if (
-    !form.firstName.trim() ||
-    !form.number.trim() ||
-    !form.amount
-  ) {
-    return alert("Veuillez remplir tous les champs obligatoires.");
-  }
+    if ( !form.firstName.trim() || !form.number.trim() || !form.amount) { return alert("Veuillez remplir tous les champs obligatoires.");}
+
+    if ( type === "cautisation" && !form.cotisationId) {
+        return alert("Veuillez choisir une cotisation.");
+      }
+
+    if ( type === "cautisation" && form.paymentFor === "other" && !form.otherNumber.trim()) {
+        return alert("Veuillez saisir le numéro du membre concerné.");
+      }
+
     const articleType = getArticleType()
-    const domain = import.meta.env.VITE_CLIENT_URL
+    const domain = import.meta.env.VITE_CLIENT_URL;
+    const severDomain = import.meta.env.VITE_API_URL;
+    logData("severDomain", severDomain)
     
     const paymentData = {
       totalPrice: Number(form.amount),
@@ -145,25 +224,46 @@ const getArticleType = () => {
       numeroSend: form.number.trim(),
       nomclient: form.firstName,
       return_url: `${domain}`,// return_url: `${domain}/callback`, à personaliser selon le type de paiement( carte, cautisation...)
-      webhook_url: `${domain}/webhook-url`,
+      webhook_url: `${severDomain}/webhook`,
 
       personal_Info: [
-        {
-          type,
-          article: articleType,
-          auteur: author,
-          otherNumber: form.otherNumber
+      {
+        type: type,
+        article: articleType,
 
+        auteur: user.firstName,
+
+        paymentFor: form.paymentFor,
+
+        otherNumber: form.otherNumber,
+
+        cotisationId: form.cotisationId,
+
+        cardId: form.cardId,
+
+        eventId: form.eventId,
+      },
+    ],
+    };
+
+    console.log("paymentData", paymentData);
+    const added = await addPayment(paymentData)
+    await getAllPayments()
+    console.log("added",added);
+
+    
+    // goTo("/home", { state: state})
+    if (added) {
+      const fusionPayload = {
+      ...paymentData,
+      personal_Info: [
+        {
+          ...paymentData.personal_Info[0],
+          paymentId: added.id,
         },
       ],
     };
-
-    const added = await addPayment(paymentData)
-    await getAllPayments()
-    console.log(payments);
-    // goTo("/home", { state: state})
-    if (added) {
-      const response = await makePayment(paymentData)
+      const response = await makePayment(fusionPayload)
       if (response) {
         window.location.href = response.url
       }
@@ -178,11 +278,12 @@ const getArticleType = () => {
       <div className="w-full  grid gap-4 mt-10 bg-white rounded-2xl p-5 space-y-4">
 
         <h1 className="text-xl font-bold text-center">
-          {getArticleName(type)}
+          {getArticleName(type)} {type === "event" &&( <>{state?.title}  </>)} 
         </h1>
 
         {/*  TYPE SELECT */}
-        {!isFromState && (<div className="flex gap-2 justify-center">
+        {!isFixedType  && 
+        (<div className="flex gap-2 justify-center">
           <button
             onClick={() => setType("member")}
             className={`px-2 py-1 rounded ${
@@ -211,14 +312,100 @@ const getArticleType = () => {
           </button>
         </div>)}
 
+        {type === "cautisation" && (
+        <div className="space-y-2">
+
+          <label className="font-medium">
+            Cette cotisation est destinée à :
+          </label>
+
+          <div className="flex gap-2">
+
+            <button
+              type="button"
+              onClick={() => handleChange("paymentFor", "self")}
+              className={`px-3 py-2 rounded ${
+                form.paymentFor === "self"
+                  ? "bg-green-600 text-white"
+                  : "bg-gray-200"
+              }`}
+            >
+              Moi-même
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleChange("paymentFor", "other")}
+              className={`px-3 py-2 rounded ${
+                form.paymentFor === "other"
+                  ? "bg-green-600 text-white"
+                  : "bg-gray-200"
+              }`}
+            >
+              Une autre personne
+            </button>
+
+          </div>
+
+        </div>
+      )}
+
+      {type === "cautisation" && (
+        <div>
+
+          <label className="block mb-1 font-medium">
+            Type de cotisation
+          </label>
+
+          <select
+            value={form.cotisationId}
+            onChange={(e) =>
+              handleChange("cotisationId", e.target.value)
+            }
+            className="w-full rounded-lg border p-2"
+          >
+            <option value="">
+              Choisir une cotisation
+            </option>
+
+            {cotisations.map(item => (
+              <option key={item.id} value={item.id}>
+                {item.title} - {item.amount.toLocaleString()} FCFA
+              </option>
+            ))}
+          </select>
+
+        </div>
+      )}
+
+        {type === "cautisation" &&
+        form.paymentFor === "other" && (
+          <Input
+            type="tel"
+            placeholder="Numéro du membre concerné"
+            value={form.otherNumber}
+            onChange={(e) =>
+              handleChange("otherNumber", e.target.value)
+            }
+          />
+        )}
         {/* NOM */}
         <Input
           type="text"
           placeholder="Nom"
           value={form.firstName}
           onChange={(e) => handleChange("firstName", e.target.value)}
-          disabled={type === "member"}
+          // disabled={type === "member"}
         />
+        {type === "carte" && (
+          <Input
+          type="text"
+          // placeholder="Nom"
+          value={form.cardId}
+          onChange={(e) => handleChange("cardId", e.target.value)}
+          disabled
+        />
+        )}
         {type === "other" &&(
           <Input
           type="tel"
@@ -234,7 +421,7 @@ const getArticleType = () => {
           placeholder="Numero à debiter "
           value={form.number}
           onChange={(e) => handleChange("number", e.target.value)}
-          disabled={type === "member"}
+          // disabled={type === "member"}
         />
 
         {/* MONTANT */}
@@ -243,6 +430,7 @@ const getArticleType = () => {
           placeholder="Montant"
           value={form.amount}
           onChange={(e) => handleChange("amount", e.target.value)}
+          // disabled
         />
 
         <SubmitButton 

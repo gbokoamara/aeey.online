@@ -31,6 +31,7 @@ export const AddEvent = () => {
     rescheduledAt: "",
     location: "",
     image: "",
+    amount: "",
   });
 
   const handleChange = (name, value) => {
@@ -45,6 +46,7 @@ export const AddEvent = () => {
       rescheduledAt: "",
       location: "",
       image: "",
+      amount: "",
     });
     setSelectedEvent(null);
     setActiveModal(false);
@@ -94,6 +96,7 @@ export const AddEvent = () => {
       rescheduledAt: event.rescheduledAt?.slice(0, 10),
       location: event.location,
       image: event.image,
+      amount: event.amount,
     });
   };
 
@@ -226,6 +229,7 @@ export const AddEvent = () => {
 
               <div className="p-4 space-y-2">
                 <h3 className="font-semibold text-lg">{event.title}</h3>
+                <h4 className="font-semibold text-lg">{event.amount}</h4>
                 <p className="text-sm text-gray-500">{event.description}</p>
 
                 <div className="flex justify-between">
@@ -309,6 +313,12 @@ export const AddEvent = () => {
                 type="text"
                 placeholder="Titre"
                 onChange={(e) => handleChange("title", e.target.value)}
+              />
+              <Input
+                value={form.amount}
+                type="number"
+                placeholder="Participation: ex 15 000"
+                onChange={(e) => handleChange("amount", e.target.value)}
               />
 
               <Input

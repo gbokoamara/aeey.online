@@ -19,6 +19,9 @@ import { userOnLocal } from "../helper/getUser";
 import { Events } from "../component/events/events";
 import { AutoScroll } from "../utils/autoScroll";
 import { usePayment } from "../hooks/usePayment";
+import { checkPaymentStatus } from "../config/checkPaymentStatus";
+import { useWebhook } from "../hooks/useWebhook";
+import { useCard } from "../hooks/useCard";
 
 export const HomePage = () => {
   const [showCreatePin, setShowCreatePin] = useState(false);
@@ -26,11 +29,11 @@ export const HomePage = () => {
   const { getState } = useAppNavigation();
   const state = getState();
   if (state) {
-    console.log("state at home :=>", state);
+    // console.log("state at home :=>", state);
   }
   const user = userOnLocal();
   const { createPin } = useAuth();
-  logData("userData at home", user);
+  // logData("userData at home", user);
     const {
         error,
         loading,
@@ -39,7 +42,10 @@ export const HomePage = () => {
         addPayment,
         getPayment, 
         getAllPayments,
-        } = usePayment()
+        } = usePayment();
+
+    const {checkPayment} = useWebhook();
+    const {getRequestCard} = useCard()
 
 
   useEffect(() => {
@@ -53,11 +59,11 @@ export const HomePage = () => {
   }, [user]);
 
   const handleCreatePin = async (pin) => {
-    console.log("Nouveau PIN:", pin);
+    // console.log("Nouveau PIN:", pin);
 
     // API backend
     const updatedUser = await createPin(pin, user.id);
-    logData("user modifié", updatedUser);
+    // logData("user modifié", updatedUser);
     setItem("user", updatedUser);
 
     setShowCreatePin(false);
@@ -69,6 +75,32 @@ export const HomePage = () => {
     user?.lastName || state?.member?.name || state?.user?.lastName;
   const finalPhoto = user?.photo || state?.member?.photo || state?.user?.photo;
   const finalDate = user?.date || state?.member?.date || state?.user?.date;
+
+   useEffect(() => {
+    const fetchPaymentStatus = async () => {
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get("token");
+
+      console.log("TOKEN =>", token);
+
+      if (!token) return;
+
+      try {
+        const paymentDetails = await checkPaymentStatus(token);
+        console.log("paymentDetails", paymentDetails);
+        if (paymentDetails) {
+          const status = await checkPayment(paymentDetails?.data);
+          if (status === true) {
+            getRequestCard()
+          }
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchPaymentStatus();
+  }, []);
 
   return (
     <>
@@ -84,17 +116,18 @@ export const HomePage = () => {
         </div>
 
         <div className=" flex flex-col gap-10 pt-24 bg-amber-50  md:pt-56 text-center w-full  h-auto  text-black justify-start items-center rounded-t-2xl ">
-          <div className="grid gap-5 ">
-
-            <AutoScroll axis="horizontal" speed={50} height={90} showPauseButton>
-              <h1>Bienvenue à l'Association des Élèves et Étudiants de Yaokro</h1>
-            </AutoScroll>
+          <div className="grid gap-5  w-screen md:w-3xl px-2">
+            {/* <AutoScroll axis="horizontal" speed={50} height={50} showPauseButton> */}
+              <h1 className="font-bold font-serif text-lg">Bienvenue à l'Association des Élèves et Étudiants de Yaokro</h1>
+            {/* </AutoScroll> */}
             <IconNav />
           </div>
-          <div className="">
+          <div>
             <Events />
           </div>
-          <div className=" w-[80%] md:w-[40%] ">
+          <div className="  w-screen md:w-3xl  p-2 rounded gap-2"
+          // className=" w-[95%] md:w-[65%] lg:w-[40%]"
+          >
             <PaymentList payments={payments} />
           </div>
         </div>

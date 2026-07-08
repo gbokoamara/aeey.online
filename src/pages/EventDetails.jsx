@@ -3,15 +3,13 @@ import { useParams } from "react-router-dom";
 import { eventsAds } from "../data/payment";
 import { useEvent } from "../hooks/useEvent";
 import BackButton from "../utils/backButton";
+import Button from "../utils/button";
+import { useAppNavigation } from "../hooks/useAppNavigation";
 
 export const EventDetail = () => {
-  const { event, getEvent } = useEvent()
+  const { event, getEvent } = useEvent();
+  const { goTo } = useAppNavigation();
   const { id } = useParams();
-
-  // const [event, setEvent] = useState(() => {
-  //   // fallback local (important)
-  //   return events.find((e) => String(e.id) === String(id)) || null;
-  // });
 
   useEffect(() => {
         getEvent(id)
@@ -19,8 +17,20 @@ export const EventDetail = () => {
 
   if (!event) return <p>Événement introuvable...</p>;
 
+  // Paiement
+  const handleSubmit = () => {
+    goTo("/paiement", {
+      state: {
+        type:"event",
+        eventId: event.id,
+        title: event.title,
+        amount: event.amount,
+      },
+    });
+  };
+
   return (
-    <div className="p-4 bg-amber-50 ">
+    <div className="p-4 md:p-9 bg-amber-50 rounded">
       <BackButton className="top-10" />
       <img
         src={event.image}
@@ -45,6 +55,22 @@ export const EventDetail = () => {
       )}
 
       <p className="mt-3">{event.description}</p>
+      <div className="py-5 grid "> 
+        <div className="flex justify-between w-full ">
+           <p>Nombre de participant:</p> <strong> {event.participantCount}</strong>
+        </div>
+        <div className="flex justify-between w-full ">
+          <p>Total de participation: </p> <strong>{event.collectedAmount}</strong>
+        </div>
+      </div>
+      <div className="flex justify-between">
+        <p className="mt-3">{event.amount || 0} FCFA</p>
+        <Button
+            children="Payer ma participation "
+            className="w-64 bg-blue-600 text-white mt-2 py-1"
+            onClick={handleSubmit}
+          />
+      </div>
     </div>
   );
 };

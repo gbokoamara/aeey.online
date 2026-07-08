@@ -3,10 +3,10 @@ import axios from "axios";
 const apiUrl = import.meta.env.VITE_FUSION_PAY ; 
 
 
-export const makePayment = async (paymentData) => {
-  console.log("paymentData dans makePayment =>", paymentData)
+export const makePayment = async (fusionPayload) => {
+  console.log("fusionPayload dans makePayment =>", fusionPayload)
   try {
-    const response = await axios.post(apiUrl, paymentData, {
+    const response = await axios.post(apiUrl, fusionPayload, {
       headers : {
         "Content-Type" : "application/json",
       },

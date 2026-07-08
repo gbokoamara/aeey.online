@@ -67,14 +67,14 @@ export const useCard = () => {
     try {
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CARD.REQUEST_CARD}/${userId}`;
       const response = await axios.post(url, { cardData });
-      logData("response", response)
+      // logData("response", response)
       const requestedCard = response?.data?.card;
       setCard(requestedCard);
       return requestedCard
     } catch (error) {
       const message = error?.response?.data?.message || "Erreur inconnue";
       // console.error("requestCard error", error);
-      logData("error", message)
+      // logData("error", message)
       setError(message)
       return { success: false, message };
     } finally {

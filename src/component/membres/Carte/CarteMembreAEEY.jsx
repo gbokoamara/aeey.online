@@ -8,7 +8,7 @@ export default function CarteMembreAEEY() {
   const cardRef = useRef(null);
   const [downloading, setDownloading] = useState(false);
   const { card, loading, getRequestCard, userId } = useCard();
-  logData("card", card)
+  // logData("card", card)
   useEffect(() => {
     if (userId) getRequestCard(userId);
   }, [userId]);

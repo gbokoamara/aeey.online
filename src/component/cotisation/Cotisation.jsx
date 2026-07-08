@@ -1,35 +1,40 @@
+
 import { useEffect, useState } from "react";
 import Input from "../../utils/input";
 import Button from "../../utils/button";
 import { Modal } from "../../utils/Modal";
 import { logData } from "../../utils/console";
 import { PaymentCard } from "../cards/PaymentCard";
-import { useExpense } from "../../hooks/useExpense";
-import { ExpenseCard } from "./ExpenseCard";
+import { Link } from "react-router-dom";
+import { useCotisation } from "../../hooks/useCotisation";
+import { dateUi } from "../../helper/date";
+import { capitalize } from "../../helper/Capitalizer";
+import { CotisationCard } from "./cotisationCard";
 
-export const ExpensePage = () => {
+export const Cotisation = () => {
   const [activeModal, setActiveModal] = useState(false);
   const [reschedule, setReschedule] = useState("");
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
-  const [selectedExpense, setSelectedExpense] = useState(null);
+  const [selectedCotisation, setSelectedCotisation] = useState(null);
   const {
     loading,
-    expense,
-    expenses,
-    addExpense,
-    updateExpense,
-    getAllExpenses,
-    getExpense,
-    deleteExpense,
-  } = useExpense();
+    cotisation,
+    cotisations,
+    addCotisation,
+    updateCotisation,
+    getCotisations,
+    getCotisation,
+    deleteCotisation,
+  } = useCotisation();
 
+  logData("cotisations", cotisations)
   const [form, setForm] = useState({ //     
-    name: "",
+    title: "",
     description: "",
-    phoneNumber: "",
+    // phoneNumber: "",
     amount: "",
-    method: "",
+    period: "",
   });
 
   const handleChange = (name, value) => {
@@ -38,27 +43,27 @@ export const ExpensePage = () => {
 
   const resetForm = () => {
     setForm({
-      name: "",
+      title: "",
       description: "",
-      phoneNumber: "",
+    //   phoneNumber: "",
       amount: "",
-      method: "",
+      period: "",
     });
-    setSelectedExpense(null);
+    setSelectedCotisation(null);
     setActiveModal(false);
   };
 
   const handleSubmit = async () => {
     try {
       if (reschedule === "Modifier") {
-        await updateExpense(selectedExpense.id, form);
-        // alert("Expense modifié !");
+        await updateCotisation(selectedCotisation.id, form);
+        // alert("cotisation modifié !");
       } else {
-        await addExpense(form);
-        // alert("Expense ajouté !");
+        await addCotisation(form);
+        // alert("cotisation ajouté !");
       }
       resetForm();
-      getAllExpenses();
+      getCotisations();
       setReschedule(false);
     } catch (err) {
       console.error(err);
@@ -66,28 +71,28 @@ export const ExpensePage = () => {
   };
 
 
-  const handleEdit = (expense) => {
-    setSelectedExpense(expense);
+  const handleEdit = (cotisation) => {
+    setSelectedCotisation(cotisation);
     setForm({
-      name: expense.name,
-      description: expense.description,
-      phoneNumber: expense.phoneNumber,
-      amount: expense.amount,
-      method: expense.method,
+      title: cotisation.title,
+      description: cotisation.description,
+    // //   phoneNumber: cotisation.phoneNumber,
+      amount: cotisation.amount,
+      period: cotisation.period,
     });
   };
 
 
 
-    const handleDelete = async (expense) => {
-    if (confirm("Supprimer cet événement ?")) {
-      await deleteExpense(expense.id);
+    const handleDelete = async (cotisation) => {
+    if (confirm("Supprimer cette cautisation ?")) {
+      await deleteCotisation(cotisation.id);
     }
-    getAllExpenses()
+    getCotisations()
   };
 
   useEffect(() => {
-    getAllExpenses()
+    getCotisations()
   }, []);
 
   const getTitle = () => {
@@ -108,12 +113,12 @@ export const ExpensePage = () => {
   };
 
   // filtrage
-  const safeExpenses = Array.isArray(expenses) ? expenses : [];
+  const safecotisations = Array.isArray(cotisations) ? cotisations : [];
   // filtrage simple
-  const filteredExpenses = safeExpenses?.filter((e) => {
+  const filteredcotisations = safecotisations?.filter((e) => {
     const matchSearch =
-      e.name.toLowerCase().includes(search.toLowerCase()) ||
-      e.method?.toLowerCase().includes(search.toLowerCase());
+      e.title.toLowerCase().includes(search.toLowerCase()) ||
+      e.period?.toLowerCase().includes(search.toLowerCase());
 
     if (statusFilter === "ALL") return matchSearch;
     if (statusFilter === "ACTIVE") return matchSearch && e.isActive;
@@ -123,8 +128,8 @@ export const ExpensePage = () => {
   });
 
   // stats
-  const total = expenses?.length || 0;
-  const activeCount = safeExpenses.filter((e) => e.amount).length;
+  const total = cotisations?.length || 0;
+  const activeCount = safecotisations.filter((e) => e.amount)?.length;
   const inactiveCount = total - activeCount;
 
   if (loading) {
@@ -133,7 +138,7 @@ export const ExpensePage = () => {
   return (
     <div className="md:p-6 grid  gap-6">
        <div>
-            <h1>Gestion des dépenses</h1>
+            <h1>Gestion des cautisations</h1>
         </div>
       {/* zone de filtre et stats + boutton ajouter */}
       <div className="bg-white shadow-md rounded-2xl p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -184,20 +189,20 @@ export const ExpensePage = () => {
         />
       </div>
       {/* </div> */}
-      {/* LISTE ExpenseS */}
-      {expenses.length > 0 && (
-        <div className="space-y-1 grid ">
-          {expenses.map((expense) => (
-            
-          <ExpenseCard expense={expense} key={expense.id} setReschedule={setReschedule}
-            resetForm={resetForm} setActiveUpdateModal={setActiveModal} handleEdit={handleEdit} 
-            handleDelete={handleDelete}
-          />
-               
-          
-          ))}
-        </div>
-      )}
+      {/* LISTE cotisationS */}
+      {cotisations.length > 0 && (
+              <div className="space-y-5 grid  ">
+                {cotisations.map((cotisation) => (
+                  
+                <CotisationCard cotisation={cotisation} key={cotisation.id} setReschedule={setReschedule}
+                  resetForm={resetForm} setActiveUpdateModal={setActiveModal} handleEdit={handleEdit} 
+                  handleDelete={handleDelete}
+                />
+                     
+                
+                ))}
+              </div>
+            )}
 
       {activeModal && (
         <div>
@@ -211,10 +216,10 @@ export const ExpensePage = () => {
               <h2 className="text-xl font-semibold">{getTitle()}</h2>
 
               <Input
-                value={form.name}
+                value={form.title}
                 type="text"
                 placeholder="Titre"
-                onChange={(e) => handleChange("name", e.target.value)}
+                onChange={(e) => handleChange("title", e.target.value)}
               />
 
               <Input
@@ -230,20 +235,12 @@ export const ExpensePage = () => {
                 placeholder="Description"
                 onChange={(e) => handleChange("description", e.target.value)}
               />
-
-              <Input
-                value={form.phoneNumber}
-                type="tel"
-                placeholder="Numero"
-                onChange={(e) => handleChange("phoneNumber", e.target.value)}
-              />
              
-              
               <Input
-                value={form.method}
-                type="text"
-                placeholder="Methode"
-                onChange={(e) => handleChange("method", e.target.value)}
+                value={form.period}
+                type="date"
+                placeholder="periode"
+                onChange={(e) => handleChange("period", e.target.value)}
               />
 
               <div className="flex gap-2">

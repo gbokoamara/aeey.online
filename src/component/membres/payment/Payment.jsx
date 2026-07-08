@@ -1,12 +1,21 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BanknoteArrowDown, X } from "lucide-react";
-import { expenses, userPayments } from "../../../data/payment";
+import { expenses,  } from "../../../data/payment";
 import BackButton from "../../../utils/backButton";
 import { PaymentCard } from "../../cards/PaymentCard";
+import { usePayment } from "../../../hooks/usePayment";
+import { logData } from "../../../utils/console";
 
 export const UserPaymentHistoryPage = () => {
   const [selectedExpense, setSelectedExpense] = useState(null);
+  const {userPayments, getUserPayments } = usePayment()
+
+  useEffect(() => {
+    getUserPayments()
+  }, []);
+
+  logData("userPayments", userPayments)
 
   return (
     <>
@@ -15,7 +24,7 @@ export const UserPaymentHistoryPage = () => {
 
         <div className="grid gap-6 mt-15">
           <h1 className="text-center text-white md:text-2xl font-bold text-lg">
-            Historique des depenses
+            Historique de mes  paiements
           </h1>
 
           {/* LISTE SIMPLE */}

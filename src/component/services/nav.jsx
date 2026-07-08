@@ -1,12 +1,22 @@
 import {  History, Landmark, IdCard, UserCheck } from "lucide-react";
+import { useAppNavigation } from "../../hooks/useAppNavigation";
 
 const IconNav = () => {
+  const {goTo} = useAppNavigation();
+
+  const handleSubmit = () => {
+    goTo("/paiement", {
+      state: {
+        type:"cautisation",
+      },
+    });
+  };
   return (
-    <div className=" flex gap-6 w-full md:w-3xl  md:justify-around overflow-hidden"> 
+    <div className=" flex gap-6 w-full md:w-3xl  md:justify-around overflow-hidden "> 
       {/* fixed bottom-4 left-1/2 -translate-x-1/2 bg-white shadow-lg px-6 py-3 rounded-full */}
-      <a href="/paiement" className="p-2 rounded-full bg-green-200 text-red-800 hover:bg-gray-100">
+      <button onClick={handleSubmit}  className="p-2 rounded-full bg-green-200 text-red-800 hover:bg-gray-100 cursor-pointer">
         <Landmark className="w-7 h-7" /> 
-      </a>
+      </button>
 
       <a href="/historique" className="p-2 rounded-full bg-green-200 text-red-800 hover:bg-gray-100">
         <History className="w-7 h-7" />

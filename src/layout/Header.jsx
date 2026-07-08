@@ -1,4 +1,4 @@
-import { Settings, Eye, EyeOff } from "lucide-react";
+import { Settings, Eye, EyeOff, HeartHandshake } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import PinInput from "../utils/pinInput";
 import { useAuth } from "../hooks/useAuth";
@@ -7,6 +7,8 @@ import { logData } from "../utils/console";
 import { Modal } from "../utils/Modal";
 import { usePayment } from "../hooks/usePayment";
 import { formatNumber } from "../helper/formatNumber";
+import Button from "../utils/button";
+import { useAppNavigation } from "../hooks/useAppNavigation";
 
 const Header = () => {
   const { verifyPin } = useAuth();
@@ -17,7 +19,9 @@ const Header = () => {
   const { getItem } = useLocalStorage();
   const user = getItem("user");
   const {stats, getPaymentStat} = usePayment()
-  logData("stats", stats)
+  const { goTo } = useAppNavigation();
+  
+  // logData("stats", stats)
   useEffect(() => {
     getPaymentStat()
   }, [])
@@ -44,7 +48,7 @@ const Header = () => {
 
   //  Quand le PIN est correct
   const handlePinComplete = async (pin) => {
-    logData("pin", pin);
+    // logData("pin", pin);
     const isMatch = await verifyPin(pin, user?.id);
     if (isMatch === true) {
       setIsUnlocked(true);
@@ -75,13 +79,27 @@ const Header = () => {
     };
   }, []);
 
+  // Paiement
+  const handleSubmit = () => {
+    goTo("/paiement", {
+      state: {
+        type:"guest",
+      },
+    });
+  };
+
   return (
     <>
-      <div className="sticky top-0 bg-green-600 h-16 z-50 flex items-center px-4 text-white w-screen">
+      <div className="sticky top-0 bg-green-600 h-16 z-50 flex justify-between items-center px-4 md:pr-7 text-white w-screen">
         <a href="/settings">
-          <Settings className="w-6 h-6" />
+          <Settings size={40} color="#090107" />
         </a>
 
+        <Button
+            children={<><div className="flex items-center gap-4"><HeartHandshake size={40} color="#f906ac" /> <span className="hidden md:flex"> Faire un don</span></div></>}
+            className="w  "
+            onClick={handleSubmit}
+          />
         <div
           className={`
             absolute left-1/2 -translate-x-1/2 flex items-center gap-2

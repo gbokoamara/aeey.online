@@ -17,7 +17,7 @@ import { logData } from "../utils/console";
 import { userOnLocal } from "../helper/getUser";
 import { AddEvent } from "../component/events/eventForm";
 import { ExpensePage } from "../component/expenses/ExpensesComponent";
-import { CardAdministration } from "../component/cards/CardAdministration";
+import { Cotisation } from "../component/cotisation/Cotisation";
 
 export const SettingPage = () => {
   const {logout} = useAuth()
@@ -73,8 +73,8 @@ export const SettingPage = () => {
         return <AddEvent />;
       case "expenses":
         return <ExpensePage />;
-      case "Card":
-        return <CardAdministration />;  
+      case "cautisation":
+        return <Cotisation />;  
       default:
         return null;
     }
@@ -85,7 +85,7 @@ export const SettingPage = () => {
   };
   
   return (
-    <div className="min-h-screen grid md:grid-cols-6 p-2 gap-5">
+    <div className="min-h-screen grid md:grid-cols-8 p-2 gap-5">
       <BackButton className="top-2" />
 
       {/* ================= MOBILE FULLSCREEN ================= */}
@@ -107,7 +107,7 @@ export const SettingPage = () => {
       )}
 
       {/* ================= SIDEBAR ================= */}
-      <div className="col-span-1">
+      <div className="col-span-2">
 
         <div className="text-center mt-10 bg-white rounded-2xl p-3">
           <h1 className="text-2xl font-bold">Paramètres</h1>
@@ -137,19 +137,19 @@ export const SettingPage = () => {
               onClick={() => handleClick("profil")}
             />
 
+             <Button
+                children="Le Bilan"
+                onClick={() => handleClick("payments")}
+            />
+
             <Button
               children="Demande carte"
               onClick={() => handleClick("carte")}
             />
 
             <Button
-              children="Historique"
+              children="Mes paiements"
               onClick={() => handleClick("history")}
-            />
-
-            <Button
-                children="Paiements"
-                onClick={() => handleClick("payments")}
             />
 
           </div>
@@ -179,8 +179,8 @@ export const SettingPage = () => {
               />
 
               <Button
-                children="Gestion des carteS"
-                onClick={() => handleClick("Card")}
+                children="Gestion des cautisations"
+                onClick={() => handleClick("cautisation")}
               />
 
             </div>
@@ -188,16 +188,16 @@ export const SettingPage = () => {
 
           {/* LOGOUT */}
           <div className="">
-            <Button children="Se déconnecter" className={'bg-red-500 hover:bg-red-600 w-full'} onClick={handleLogout}/>
+            <Button children="Se déconnecter" className={'bg-red-500 hover:bg-red-600 py-2 w-full'} onClick={handleLogout}/>
           </div>
 
         </div>
       </div>
 
       {/* ================= DESKTOP CONTENT ================= */}
-      <div className="hidden md:block col-span-5 p-5">
+      <div className="hidden md:block col-span-6 p-5">
 
-        <div className="bg-slate-200 p-5 h-full rounded-2xl">
+        <div className="bg-slate-50 p-5 h-full rounded-2xl">
 
           {showComponent() || (
             <div className="text-gray-500 flex items-center justify-center h-full">

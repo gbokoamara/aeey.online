@@ -23,15 +23,16 @@ export const Events = () => {
           events?.map((event, index) => 
           {
             const description = event.description
-            const shouldScroll = description?.length > 80;
+            const shouldScroll = description?.length > 100;
 
             return (
             <div
               key={index}
-              className="bg-slate-100   rounded shrink-0 grid grid-cols-6 relative pr-6 shadow"
+              className="bg-slate-100 py-1  rounded shrink-0 grid grid-cols-6 relative pr-6 shadow"
             >
               {/* Texte */}
-              <div className=" col-span-4 text-left p-2 flex flex-col justify-between">
+              <div onClick={() => navigate(`/event/${event.id}`)}
+              className=" col-span-4 text-left p-2 flex flex-col  justify-between cursor-pointer">
                 <div>
                   <h1 className="font-semibold text-sm">{event.title}</h1>
                   { shouldScroll ?
@@ -44,7 +45,7 @@ export const Events = () => {
                    }
                 </div>
 
-                <p className="text-[11px] text-gray-500">
+                <p className="text-[11px] text-black ">
                   {dateUi(event.date)}
                 </p>
               </div>

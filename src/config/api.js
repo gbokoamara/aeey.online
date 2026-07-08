@@ -41,7 +41,7 @@ export const API_CONFIG = {
         CARD:{
             GET_REQUEST : "/card/get",
             GET_ALL : "/card/gat-all",
-            GET_ALL_REQUEST : "card/get-all-request",
+            GET_ALL_REQUEST : "/card/get-all-request",
             REQUEST_CARD : "/card/create",
             UPDATE_CARD : "/card/update",
             DELETE : "/card/delete",
@@ -57,9 +57,21 @@ export const API_CONFIG = {
          PAYMENT:{
             ADD: "/payment/add",
             GET: "/payment/get",
+            GET_BY_USERID: "/payment/getByUserId",
             GET_ALL: "/payment/get-all",
             STAT: "/payment/get-stat",
-
-         }
+         },
+         WEBHOOK:{
+            CHECK : "/webhook/check",
+            // PASSWORD : "/auth/password",
+            // VERIFY_PASSWORD : "/auth/password-verify"
+        },
+        COTISATION:{
+            ADD : "/cotisation/add",
+            UPDATE : "/cotisation/update",
+            GET_ALL: "/cotisation/getcotisations", 
+            GET_ONE: "/cotisation/getcotisation", 
+            DELETE_ONE : "/cotisation/delete",
+         },
     }
 }

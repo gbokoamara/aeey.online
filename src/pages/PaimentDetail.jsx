@@ -1,15 +1,29 @@
 import { useParams } from "react-router-dom";
-import { payments, userPayments } from "../data/payment";
+// import { payments, userPayments } from "../data/payment";
 import { HandCoins, Share2, SkipBack } from "lucide-react";
 import BackButton from "../utils/backButton";
+import { logData } from "../utils/console";
+import { usePayment } from "../hooks/usePayment";
+import { useEffect } from "react";
+import { dateUi } from "../helper/date";
+import { formatNumber } from "../helper/formatNumber";
 // import { payments } from "./chemin/vers/payments";
 
 export const PaiementDetailPage = () => {
 
   const { id } = useParams();
-  const paiement = payments[Number(id)] || userPayments[Number(id)];
+  logData("id", id)
 
-  if (!paiement) {
+  const {payment,stats, getPaymentStat, getPayment} = usePayment();
+  useEffect(() => {
+    getPaymentStat()
+  }, [])
+
+  useEffect(() => {
+    getPayment(id)
+  }, [id])
+
+  if (!payment) {
     return (
       <div className="h-screen w-screen flex items-center justify-center text-red-600 bg-amber-50">
         Paiement introuvable
@@ -20,10 +34,10 @@ export const PaiementDetailPage = () => {
   const handleShare = async () => {
     const text = `
         Paiement
-        Nom: ${paiement.name}
-        Montant: ${paiement.amount} FCFA
-        Moyen: ${paiement.mobile}
-        Date: ${paiement.date}
+        Nom: ${payment.name}
+        Montant: ${payment.amount} FCFA
+        Moyen: ${payment.mobile}
+        Date: ${payment.date}
             `;
 
     if (navigator.share) {
@@ -49,10 +63,10 @@ export const PaiementDetailPage = () => {
         <div className=" flex justify-center text-3xl text-white   ">
           <HandCoins size={40} />
         </div>
-        <div className="text-3xl text-white "> + {paiement?.amount} F</div>
+        <div className="text-3xl text-white "> + {payment?.amount} F</div>
         <div className="text-md  flex gap-3 text-white  ">
-          <p>Paiment cautisation de </p>
-          <p className="text-lg uppercase">{paiement.name}</p>
+          <p>Paiment pour {payment.type}  de </p>
+          <p className="text-lg uppercase">{payment.name}</p>
         </div>
       </div>
       <button
@@ -75,11 +89,11 @@ export const PaiementDetailPage = () => {
           <p>Date </p>
         </div>
         <div className="col-span-1 space-y-4">
-          <p> {paiement.mobile}</p>
-          <p>{paiement.number}</p>
-          <p> {paiement.amount} FCFA</p>
-          <p> 30 000 FCFA</p>
-          <p>{paiement.date}</p>
+          <p> {payment.method || "Mobile"}</p>
+          <p>{payment.phoneNumber}</p>
+          <p> {payment.amount} FCFA</p>
+          <p> {stats ? formatNumber(stats?.totalAmount) : "35 000"} FCFA</p>
+          <p>{dateUi(payment.updatedAt)}</p>
         </div>
       </div>
     </div>

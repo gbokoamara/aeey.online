@@ -1,5 +1,5 @@
 
-const Input = ({ placeholder, value, onChange, type = "text", required }) => {
+const Input = ({ placeholder, value, onChange, type = "text", required, className="", ...props }) => {
   return (
     <input
       type={type}
@@ -7,7 +7,8 @@ const Input = ({ placeholder, value, onChange, type = "text", required }) => {
       value={value}
       onChange={onChange}
       required={required}
-      className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+      className={`w-full px-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 ${className}`}
+      {...props}
     />
   );
 };
