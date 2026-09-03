@@ -1,11 +1,11 @@
 
 import { API_CONFIG } from "../config/api";
-import axios from "axios"
 import { logData } from "../utils/console";
 import { useLocalStorage } from "./useLocalStorage";
 import { useState } from "react";
 import { useRedirect } from "./useNavigate";
 import { userOnLocal } from "../helper/getUser";
+import api from "../config/axios";
 
 export const usePayment = () => {
     const [ loading, setLoading ] = useState(false);
@@ -26,7 +26,7 @@ export const usePayment = () => {
         try {
             const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PAYMENT.ADD}/${userId}`
             // logData("fetchUrl", url)
-            const response = await axios.post(url, {addData})
+            const response = await api.post(url, {addData})
             // logData("response on add", response)
             const payment = response?.data?.payment
             // logData("paymentData on login", payment)
@@ -47,7 +47,7 @@ export const usePayment = () => {
         try {
             const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PAYMENT.GET}/${paymentId}`
             // logData("passUrl", url)
-            const response = await axios.get(url)
+            const response = await api.get(url)
             // logData("response on pass", response)
             const payment = response?.data?.payment
             // logData("paymentData on pass", payment)
@@ -66,7 +66,7 @@ export const usePayment = () => {
         try {
             const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PAYMENT.GET_BY_USERID}/${userId}`
             logData("passUrl", url)
-            const response = await axios.get(url)
+            const response = await api.get(url)
             logData("response on pass", response)
             const payments = response?.data?.payments
             logData("paymentsData on pass", payments)
@@ -85,7 +85,7 @@ export const usePayment = () => {
         try {
             const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PAYMENT.GET_ALL}`
             // logData("passUrl", url)
-            const response = await axios.get(url)
+            const response = await api.get(url)
             // logData("response on pass", response)
             const payments = response?.data?.payments
             // logData("paymentsData on pass", payments)
@@ -104,7 +104,7 @@ export const usePayment = () => {
         try {
             const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PAYMENT.STAT}`
             // logData("passUrl", url)
-            const response = await axios.get(url)
+            const response = await api.get(url)
             // logData("response on pass", response)
             const stats = response?.data?.stats
             // logData("statsData on hooks", stats)

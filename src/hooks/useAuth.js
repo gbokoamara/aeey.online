@@ -1,25 +1,27 @@
 
 import { API_CONFIG } from "../config/api";
-import axios from "axios"
 import { logData } from "../utils/console";
 import { useLocalStorage } from "./useLocalStorage";
 import { useState } from "react";
 import { useRedirect } from "./useNavigate";
+import api from "../config/axios";
 
 export const useAuth = () => {
     const [ loading, setLoading ] = useState(false)
-    const {setItem, removeItem} = useLocalStorage()
+    const {setItem, removeItem, clear} = useLocalStorage()
     const redirect = useRedirect()
 
-    const login = async (firstName, number) => {
+    const login = async (data) => {
         setLoading(true)
         try {
             const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AUTH.REGISTER}`
             logData("fetchUrl", url)
-            const response = await axios.post(url, {firstName, number})
+            const response = await api.post(url, {data})
             logData("response on login", response)
             const user = response?.data?.user
-            logData("userData on login", user)
+            const token = response?.data?.token
+            setItem("token", token)
+            // logData("userData on login", user)
             setItem("user", user)
             return user
         } catch (error) {
@@ -35,7 +37,7 @@ export const useAuth = () => {
         try {
             const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AUTH.PASSWORD}/${userId}`
             logData("passUrl", url)
-            const response = await axios.put(url, {password})
+            const response = await api.put(url, {password})
             logData("response on pass", response)
             const user = response?.data?.user
             logData("userData on pass", user)
@@ -57,7 +59,7 @@ export const useAuth = () => {
         try {
             const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.AUTH.VERIFY_PASSWORD}/${userId}`
             logData("passUrl", url)
-            const response = await axios.post(url, {password})
+            const response = await api.post(url, {password})
             logData("response on pass", response)
             const isMatch = response?.data?.isMatch
             logData("userData on pass", isMatch)
@@ -71,8 +73,9 @@ export const useAuth = () => {
         
     };
 
-    const logout = (user) => {
-        removeItem(user);
+    const logout = () => {
+        // removeItem("user");
+        clear()
         redirect("/")
     }
 

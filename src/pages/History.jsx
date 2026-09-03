@@ -5,6 +5,7 @@ import BackButton from "../utils/backButton";
 import { BanknoteArrowDown, X } from "lucide-react";
 import { useExpense } from "../hooks/useExpense";
 import { dateUi } from "../helper/date";
+import {PagesCard} from "../component/pages/PagesCard"
 
 export const HistoryPage = () => {
   const [selectedExpense, setSelectedExpense] = useState(null);
@@ -12,11 +13,8 @@ export const HistoryPage = () => {
     loading,
     expense,
     expenses,
-    addExpense,
-    updateExpense,
     getAllExpenses,
     getExpense,
-    deleteExpense,
   } = useExpense()
 
   useEffect(() => {
@@ -25,11 +23,12 @@ export const HistoryPage = () => {
   const total = expenses.reduce((acc, expense) => acc + expense.amount, 0)
   return (
     <>
-      <div className="grid justify-center items-center text-black p-1">
-        <BackButton className="top-10" />
+      <PagesCard title="Les dépenses de l'A.E.E.Y">
+        <div >
+        <div className="grid justify-center items-center text-black p-1">
         <h1 className="text-center text-white md:text-2xl font-bold text-lg mb-5">
             Historique des depenses
-          </h1>
+        </h1>
         <div className="grid bg-white w-full md:w-3xl rounded-xl font-bold text-center py-5 gap-3">
           <h1>Statistiques des historiques de dépenses</h1>
           <div className="flex gap-5 justify-center w-full">
@@ -139,6 +138,8 @@ export const HistoryPage = () => {
           </div>
         </div>
       )}
+        </div>
+      </PagesCard>
     </>
   );
 };

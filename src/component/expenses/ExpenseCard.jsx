@@ -19,9 +19,15 @@ export const ExpenseCard = ({ expense, setReschedule, resetForm, setActiveUpdate
         setActiveModal(true)
     }
 
+    const statusField = [
+      {status: "PENDING", label:"retrait en attente de validation", color:"text-gray-500"},
+      {status: "APPROVED", label:"retrait validé", color:"text-green-500"},
+      {status: "REJECTED", label:"retrait refusé", color:"text-red-500"},
+    ]
+    const currentField = statusField.find((field) => field.status === expense?.status)
   return (
     <>
-      <button
+      <div
         // to={`/paiment-detail/${expense.id}`}
         // key={index}
         onClick={() =>handleClick(expense)}
@@ -29,19 +35,16 @@ export const ExpenseCard = ({ expense, setReschedule, resetForm, setActiveUpdate
       >
         <div className="col-span-1 text-start">
           <p className="font-semibold ">{expense?.name}</p>
-          <p className="text-sm text-gray-500 md:hidden">{expense?.date}</p>
+          {currentField && ( <p className={`text-sm ${currentField.color} `} >{currentField.label}</p>)}
         </div>
 
         <div className="text-center col-span-1">
           <p className="font-bold text-green-600">{expense?.amount} FCFA</p>
         </div>
-        <div className="md:col-span-1 text-end">
-          <p className="text-sm text-gray-500 hidden md:block">
-            {dateUi(expense?.createdAt)}
-          </p>
-        </div>
-        <div className="absolute top-0 right-0 space-x-3">
-        <Button
+        
+        <div className="absolute top-0 right-0 space-x-3 flex">
+        { expense?.status === "PENDING" ? (
+          <Button
           children="Modifier"
           onClick={(e) => {
             e.stopPropagation();
@@ -52,17 +55,18 @@ export const ExpenseCard = ({ expense, setReschedule, resetForm, setActiveUpdate
           }}
           className="bg-indigo-600 text-white md:inline hidden px-4 py-2 rounded-xl "
         />
+        ):null}
         <Button
           children="Suprimer"
           onClick={(e) => {
             e.stopPropagation();
             handleDelete(expense)
           }}
-          className="bg-red-600 text-white md:inline hidden px-4 py-2 rounded-xl"
+          className="bg-red-600 text-white md:inline hidden px-4 py-2 rounded-xl w-full"
         />
         </div>
         <div className="md:hidden absolute top-1 right-0"><EllipsisVertical onClick={(e) => {e.stopPropagation(); setActiveMobile(true)}}/></div>
-      </button>
+      </div>
       {activeModal &&(
         <Modal
             isOpen={activeModal}
@@ -78,8 +82,9 @@ export const ExpenseCard = ({ expense, setReschedule, resetForm, setActiveUpdate
             onClose={() => setActiveMobile(false)}
             showCloseButton={true}
         >
-        <div className="flex justify-around">
-        <Button
+        <div className="flex justify-around  gap-1">
+        {expense.status === "PENDING" ? (
+          <Button
           children="Modifier"
           onClick={(e) => {
             e.stopPropagation();
@@ -88,15 +93,16 @@ export const ExpenseCard = ({ expense, setReschedule, resetForm, setActiveUpdate
             setActiveUpdateModal(true);
             handleEdit(expense)
           }}
-          className="bg-indigo-600 text-white  px-4 py-2 rounded-xl "
+          className="bg-indigo-600 text-white   flex-1 rounded-xl "
         />
+        ) : null}
         <Button
           children="Suprimer"
           onClick={(e) => {
             e.stopPropagation();
             handleDelete(expense)
           }}
-          className="bg-red-600 text-white  px-4 py-2 rounded-xl"
+          className="bg-red-600 text-white   flex-1 rounded-xl"
         />
         </div>
          </Modal>

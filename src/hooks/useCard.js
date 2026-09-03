@@ -3,8 +3,8 @@ import { useLocalStorage } from "./useLocalStorage";
 import { useRedirect } from "./useNavigate";
 import { userOnLocal } from "../helper/getUser";
 import { API_CONFIG } from "../config/api";
-import axios from "axios";
 import { logData } from "../utils/console";
+import api from "../config/axios";
 
 export const useCard = () => {
   const [loading, setLoading] = useState(false);
@@ -20,7 +20,7 @@ export const useCard = () => {
     setLoading(true);
     try {
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CARD.GET_ALL}`;
-      const response = await axios.get(url);
+      const response = await api.get(url);
       const allCards = response?.data?.allCards;
       setItem("allCards", allCards);
       setCards(allCards);
@@ -35,7 +35,7 @@ export const useCard = () => {
     setLoading(true);
     try {
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CARD.GET_ALL_REQUEST}`;
-      const response = await axios.get(url);
+      const response = await api.get(url);
       const allCards = response?.data?.allCards;
       setItem("allCards", allCards);
       setCards(allCards);
@@ -50,7 +50,7 @@ export const useCard = () => {
     setLoading(true);
     try {
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CARD.GET_REQUEST}/${userId}`;
-      const response = await axios.get(url); // ✅ corrigé
+      const response = await api.get(url); // ✅ corrigé
       const card = response?.data?.card;
       // logData("card on hook", card)
       setItem("card", card);
@@ -66,7 +66,7 @@ export const useCard = () => {
     setLoading(true);
     try {
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CARD.REQUEST_CARD}/${userId}`;
-      const response = await axios.post(url, { cardData });
+      const response = await api.post(url, { cardData });
       // logData("response", response)
       const requestedCard = response?.data?.card;
       setCard(requestedCard);
@@ -86,7 +86,7 @@ export const useCard = () => {
     setLoading(true);
     try {
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CARD.UPDATE_CARD}/${userId}`;
-      const response = await axios.put(url, { updateCardData });
+      const response = await api.put(url, { updateCardData });
       const card = response?.data?.card;
       setItem("card", card);
       setCard(card);
@@ -101,7 +101,7 @@ export const useCard = () => {
     setLoading(true);
     try {
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.CARD.DELETE}/${userId}`;
-      const response = await axios.delete(url);
+      const response = await api.delete(url);
       return response?.data?.message;
     } catch (error) {
       console.error("deleteCard error", error);

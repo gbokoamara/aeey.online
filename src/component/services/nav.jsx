@@ -1,4 +1,4 @@
-import {  History, Landmark, IdCard, UserCheck } from "lucide-react";
+import {  History, Landmark, IdCard, UserCheck, HandCoins } from "lucide-react";
 import { useAppNavigation } from "../../hooks/useAppNavigation";
 
 const IconNav = () => {
@@ -20,6 +20,10 @@ const IconNav = () => {
 
       <a href="/historique" className="p-2 rounded-full bg-green-200 text-red-800 hover:bg-gray-100">
         <History className="w-7 h-7" />
+      </a>
+
+      <a href="/payments" className="p-2 rounded-full bg-green-200 text-red-800 hover:bg-gray-100">
+        <HandCoins className="w-7 h-7" />
       </a>
 
       <a href="/membre" className="p-2 rounded-full bg-green-200 text-red-800 hover:bg-gray-100">

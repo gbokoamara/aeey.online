@@ -11,6 +11,8 @@ import { SettingPage } from "./pages/Setting"
 import { PaiementDetailPage } from "./pages/PaimentDetail"
 import { UserPaymentHistoryPage } from "./component/membres/payment/Payment"
 import { EventDetail } from "./pages/EventDetails"
+import { PaymentsPage } from "./pages/PaymentsPage"
+import { ApprovedExpense } from "./pages/ApprovedExpense"
 
 
 
@@ -33,6 +35,8 @@ function App() {
         <Route path="/settings" element={<SettingPage/>} />
         <Route path="/paiment-detail/:id" element={<PaiementDetailPage/>} />
         <Route path="/event/:id" element={<EventDetail />} />
+        <Route path="/payments" element={<PaymentsPage/>} />
+        <Route path="/expenses/:id" element={<ApprovedExpense/>} />
     </Routes>
    </Router>
    </>

@@ -4,6 +4,7 @@ import Button from "../../utils/button";
 import { useEvent } from "../../hooks/useEvent";
 import { Modal } from "../../utils/Modal";
 import { logData } from "../../utils/console";
+import FileUpload from "../../utils/fileUpload";
 
 export const AddEvent = () => {
   const [activeModal, setActiveModal] = useState(false);
@@ -322,6 +323,8 @@ export const AddEvent = () => {
               />
 
               <Input
+                textarea
+                // rows={6}
                 value={form.description}
                 type="text"
                 placeholder="Description"
@@ -350,11 +353,14 @@ export const AddEvent = () => {
                 onChange={(e) => handleChange("location", e.target.value)}
               />
 
-              <Input
+              <FileUpload
+                weidth = "w-64"
+                label="image de l'evenement"
+                endpoint="image"
+                accept="image/*"
+                preview
                 value={form.image}
-                type="text"
-                placeholder="URL image"
-                onChange={(e) => handleChange("image", e.target.value)}
+                onFileSelect={(url) => handleChange("image", url)}
               />
 
               <div className="flex gap-2">

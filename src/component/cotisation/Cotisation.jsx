@@ -230,8 +230,10 @@ export const Cotisation = () => {
               />
 
               <Input
+                textarea
+                // rows={6}
                 value={form.description}
-                type="text-area"
+                type="text"
                 placeholder="Description"
                 onChange={(e) => handleChange("description", e.target.value)}
               />

@@ -4,13 +4,14 @@ import { useEffect, useState } from "react";
 import Input from "../utils/input";
 import Button from "../utils/button";
 import ImageUpload from "../utils/imageUpload";
-import BackButton from "../utils/backButton";
 import { useAppNavigation } from "../hooks/useAppNavigation";
 import CarteMembreAEEY from "../component/membres/Carte/CarteMembreAEEY";
 import { userOnLocal } from "../helper/getUser";
 import { useCard } from "../hooks/useCard";
+import FileUpload from "../utils/fileUpload";
+import { PagesCard } from "../component/pages/PagesCard";
 
-export const CardPage = () => {
+export const CardPage = ({showBackButton=true}) => {
   const user = userOnLocal();
 
   const [firstName, setFirstName] = useState("");
@@ -46,6 +47,7 @@ export const CardPage = () => {
     number,
     photo,
   };
+  // console.log("cardData", cardData)
 
   const hasCardRequest = !!card;
   const isPending = card?.status === "EN_ATTENTE";
@@ -78,14 +80,22 @@ export const CardPage = () => {
   };
 
   return (
-    <div className="flex flex-col w-full min-h-90 bg-slate-200 rounded items-center gap-4 p-6 mt-10 justify-center">
-
-      <BackButton className="top-5 max-md:left-3" />
-
+    <>
+    <PagesCard title="Ma carte membre" showBackButton={showBackButton}>
+      <div>
+        <div className="flex flex-col w-full  rounded items-center gap-4 p-6 mt-10 justify-center">
       {/* Aucune demande */}
       {!hasCardRequest && (
         <>
-          <ImageUpload onImageSelect={setPhoto} />
+          {/* <ImageUpload onImageSelect={setPhoto} /> */}
+          <FileUpload
+            label="Photo"
+            endpoint="image"
+            accept="image/*"
+            preview
+            value={photo}
+            onFileSelect={(url) => setPhoto( url)}
+          />
 
           <Input
             type="tel"
@@ -169,5 +179,9 @@ export const CardPage = () => {
         </div>
       )}
     </div>
+    </div>
+    </PagesCard>
+    </>
+    
   );
 };

@@ -10,29 +10,6 @@ import { logData } from "../utils/console";
 import { makePayment } from "../config/fusionPay";
 import { useCotisation } from "../hooks/useCotisation";
 
-const COTISATIONS = [
-  {
-    id: "adhesion",
-    nom: "Adhésion",
-    montant: 5000,
-  },
-  {
-    id: "mensuelle",
-    nom: "Cotisation mensuelle",
-    montant: 1000,
-  },
-  {
-    id: "annuelle",
-    nom: "Cotisation annuelle",
-    montant: 12000,
-  },
-  {
-    id: "exceptionnelle",
-    nom: "Cotisation exceptionnelle",
-    montant: 3000,
-  },
-];
-
 export const PaymentPage = () => {
   const [initialized, setInitialized] = useState(false);
   const { getState, goTo } = useAppNavigation()
@@ -73,6 +50,8 @@ export const PaymentPage = () => {
       cardId: "",
       cotisationId: "",
       eventId: "",
+      memberId: "",
+      description: "",
     });
   
   const getArticleName = (type) => {
@@ -172,7 +151,28 @@ useEffect(() => {
   }
 }, [type]);
 
-  // const handleChange = (field, value) => { setForm({ ...form, [field]: value });};
+useEffect(() => {
+  if (type !== "cautisation") return;
+  if (cotisations.length === 0) return;
+
+  const selected = cotisations.find(
+    c => c.title === state?.cautisationName
+  );
+
+  if (!selected) return;
+
+  setForm(prev => ({
+    ...prev,
+    firstName: state?.member?.firstName || user.firstName,
+    number: state?.member?.number || user.number,
+    cotisationId: selected.id,
+    amount: selected.amount,
+    paymentFor: "self",
+    memberId: state?.member?.id,
+    description: selected?.description
+  }));
+}, [cotisations, state]);
+
   const handleChange = (field, value) => {
     if (field === "cotisationId") {
       const cotisation = cotisations.find(c => c.id === value);
@@ -194,7 +194,6 @@ useEffect(() => {
 
   let author = null
   if (type === "other") { author = user.firstName} 
-    // console.log("auteur", author);
 
   const handleSubmit = async () => {
     if ( !form.firstName.trim() || !form.number.trim() || !form.amount) { return alert("Veuillez remplir tous les champs obligatoires.");}
@@ -242,6 +241,10 @@ useEffect(() => {
         cardId: form.cardId,
 
         eventId: form.eventId,
+
+        memberId: form.memberId,
+        
+        description: form.description
       },
     ],
     };
@@ -270,17 +273,31 @@ useEffect(() => {
     }
   };
 
+  const selectedCotisation = cotisations.find(
+    (item) => item.id === form.cotisationId
+  );
   return (
     <div className="min-h-screen w-96 md:w-lg  flex flex-col items-center justify-center px-4  text-black">
 
-      <BackButton className="absolute top-15 max-md:left-6" />
+      <BackButton className="absolute top-10 md:top-15 max-md:left-6 text-white" title="Page de paiement" />
 
       <div className="w-full  grid gap-4 mt-10 bg-white rounded-2xl p-5 space-y-4">
 
         <h1 className="text-xl font-bold text-center">
           {getArticleName(type)} {type === "event" &&( <>{state?.title}  </>)} 
         </h1>
+        {/* Description de la cotisation */}
+        {type === "cautisation" && selectedCotisation?.description && (
+          <div className="rounded-lg border border-blue-200 bg-blue-50 p-3">
+            <h3 className="font-semibold text-blue-700">
+              Servira à : 
+            </h3>
 
+            <p className="mt-1 text-sm text-gray-700 whitespace-pre-line">
+              {selectedCotisation.description}
+            </p>
+          </div>
+        )}
         {/*  TYPE SELECT */}
         {!isFixedType  && 
         (<div className="flex gap-2 justify-center">
@@ -359,9 +376,8 @@ useEffect(() => {
 
           <select
             value={form.cotisationId}
-            onChange={(e) =>
-              handleChange("cotisationId", e.target.value)
-            }
+            disabled={!!state?.cautisationName}
+            onChange={(e) => handleChange("cotisationId", e.target.value)}
             className="w-full rounded-lg border p-2"
           >
             <option value="">

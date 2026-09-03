@@ -2,7 +2,6 @@
 import { useEffect, useState } from "react";
 import { BanknoteArrowDown, X } from "lucide-react";
 import { expenses,  } from "../../../data/payment";
-import BackButton from "../../../utils/backButton";
 import { PaymentCard } from "../../cards/PaymentCard";
 import { usePayment } from "../../../hooks/usePayment";
 import { logData } from "../../../utils/console";
@@ -15,28 +14,27 @@ export const UserPaymentHistoryPage = () => {
     getUserPayments()
   }, []);
 
-  logData("userPayments", userPayments)
-
+  const mobileStyle="bg-slate-50 absolute bottom-0 left-1 right-1 top-15"
   return (
     <>
-      <div className="grid justify-center items-center text-black">
-        <BackButton className="top-10" />
-
-        <div className="grid gap-6 mt-15">
-          <h1 className="text-center text-white md:text-2xl font-bold text-lg">
+      <div className="grid md:justify-center md:items-center text-black  rounded bg-slate-50 absolute bottom-0 left-1 right-1 top-15 md:static md:bg-transparent">
+        <div className="flex flex-col gap-6 mt-15">
+          <h1 className="text-center  md:text-2xl font-bold text-lg">
             Historique de mes  paiements
           </h1>
 
-          {/* LISTE SIMPLE */}
-          {userPayments.map((payment, index) => (
-            <div
-              key={index}
-              // onClick={() => setSelectedExpense(expense)}
-              className="grid gap-2 bg-slate-200 p-4 rounded-xl w-90 md:w-full cursor-pointer"
-            >
-              <PaymentCard payment={payment} key={index}/>
-            </div>
-          ))}
+         <div>
+             {/* LISTE SIMPLE */}
+              {userPayments.map((payment, index) => (
+                <div
+                  key={index}
+                  // onClick={() => setSelectedExpense(expense)}
+                  className="  p-4 rounded-xl w-full  md:w-full cursor-pointer"
+                >
+                  <PaymentCard payment={payment} key={index}/>
+                </div>
+              ))}
+         </div>
         </div>
       </div>
 

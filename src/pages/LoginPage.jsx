@@ -2,59 +2,99 @@
 import { useState } from 'react'
 import '../App.css'
 import Button from '../utils/button'
-import Input from '../utils/input'
-import {useNavigate} from 'react-router-dom'
-// import { user } from '../data/payment'
-import { useAppNavigation } from '../hooks/useAppNavigation'
+import {useNavigate, useSearchParams} from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
-import { useLocalStorage } from '../hooks/useLocalStorage'
 import { logData } from '../utils/console'
+import { formatPhoneNumber } from '../helper/formatInputNumber'
+import PhoneInput from '../utils/phoneInput'
 
 
 export const LoginPage = () => {
-  const { goTo } = useAppNavigation();
-  const { login } = useAuth();
-  const {getItem} = useLocalStorage()
+  const { login } = useAuth();  
   
-  
-  
-  const [name, setName] = useState("")
-  const [number, setNumber] = useState("")
+  const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams();
+
+  
+const [form, setForm]=useState({
+    name:"",
+    number:"",
+    countryName:"Côte d'Ivoire",
+    countryCode:"+225",
+    countryIso:"CI",
+});
+
+const handleChange = (name, value) => {
+    setForm({ ...form, [name]: value });
+};
+
+const handleCountryChange = ({ code, iso, name }) => {
+  setForm((prev) => ({
+    ...prev,
+    countryName: name,
+    countryCode: code,
+    countryIso: iso,
+  }));
+};
   
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    if (!number) {
-      return alert("Numero de téléphone obligatoire !")
+    try {
+      setLoading(true)
+      e.preventDefault()
+      if (!form.number) {
+        return alert("Numero de téléphone obligatoire !")
+      }
+      // logData("form", form)
+      const userData =  await login(form);
+      const redirect = searchParams.get("redirect");
+      navigate(redirect || "/home", { state: { userData }, replace: true,});
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setLoading(false)
     }
-    const userData =  await login(name, number);
-    goTo("/home", {state:{userData}})
   }
 
   return (
     <>
-      <section className=' flex justify-center items-center h-[50vh] md:h-[91vh] min-w-screen md:px-10'
-      // className='bg-slate-800 text-white flex justify-center items-center min-h-screen min-w-screen p-10'
-      >
-        
-        <div className='flex flex-col gap-10 text-center bg-amber-50 text-black h-full w-full justify-center items-center md:w-3xl md:h-96 rounded-2xl'>
-          <div className='grid gap-5 '>
-            <h1>bienvenue chez A.E.E.Y !</h1>
-            <p>Pour commencer, entrez votre numero de téléphone.</p>
+      <section className='grid text-center justify-center items-center h-screen  md:px-10 px-2 '>
+        {/* <div className='   min-w-screen md:px-10 '        > */}
+          
+          <div className='flex flex-col gap-10 p-5 text-center bg-amber-50 text-black   h-96 w-full justify-center items-center md:w-2xl md:h-96 rounded-2xl'>
+            <div className='grid gap-5 '>
+              <h1 className='uppercase font-serif font-bold'>bienvenue chez A.E.E.Y !</h1>
+              <p className='font-serif text-blue-800'>Pour commencer, entrez votre numero de téléphone.</p>
+            </div>
+            {/* <div>
+              <Input type={"text"} placeholder={"Nom"}  onChange={(e)=> setName(e.target.value)} />
+            </div> */}
+            <div className='text-center w-full'>
+              {/* <Input type={"tel"} placeholder={"Telephone: 0701010102"} onChange={(e)=> setPhone(formatPhoneNumber(e.target.value))} value={phone} required={true}  /> */}
+              <div className="flex rounded-xl ">
+                <PhoneInput
+                  type="tel"
+                  value={form.number} //countryName
+                  countryName={form.countryName}
+                  countryCode={form.countryCode}
+                  countryIso={form.countryIso}
+                  defaultCountry="CI"
+                  onCountryChange={handleCountryChange}
+                  onChange={(e) =>
+                    handleChange("number", e.target.value)
+                  }
+                  className="flex-1 px-3 py-3 outline-none"
+                  placeholder="Numéro de Téléphone"
+                />
+              </div>
+            </div>
+              <div className='text-center w-full'>
+                <Button children="se connecter" onClick={handleSubmit} loadingChild="Connexion en cours... " loading={loading} />
+              </div>
           </div>
-          {/* <div>
-            <Input type={"text"} placeholder={"Nom"}  onChange={(e)=> setName(e.target.value)} />
-          </div> */}
-          <div>
-            <Input type={"tel"} placeholder={"Telephone"} onChange={(e)=> setNumber(e.target.value)} value={number} required={true}  />
-            </div>
-            <div className='text-center'>
-              <Button children="se connecter" onClick={handleSubmit}/>
-            </div>
-        </div>
-        
+          
+        {/* </div> */}
       </section>
-
     </>
   )
 }

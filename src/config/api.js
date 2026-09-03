@@ -9,6 +9,7 @@ export const API_CONFIG = {
             VERIFY_PASSWORD : "/auth/password-verify"
         },
         USER:{
+            GET_USER : "/user/profil",
             UPDATE : "/user/update-profil",
             MEMBER_REQUEST : "/user/member-request",
             CARD_REQUEST : "/user/card-request",
@@ -47,12 +48,14 @@ export const API_CONFIG = {
             DELETE : "/card/delete",
         },
         EXPENSE:{
-            //   
             ADD : "/expense/add",
             UPDATE : "/expense/update",
             GET_ALL: "/expense/get-all-expenses", 
             GET_ONE: "/expense/get-expense", 
             DELETE_ONE : "/expense/delete",
+            APPROVE_ONE : "/expense/approve",
+            REJECT_ONE : "/expense/reject",
+            // approve reject
          },
          PAYMENT:{
             ADD: "/payment/add",
@@ -72,6 +75,9 @@ export const API_CONFIG = {
             GET_ALL: "/cotisation/getcotisations", 
             GET_ONE: "/cotisation/getcotisation", 
             DELETE_ONE : "/cotisation/delete",
-         },
+        },
+        CLOUDINARY:{
+            UPLOAD : "/cloudinary/upload",
+        },
     }
 }

@@ -1,10 +1,10 @@
 import { API_CONFIG } from "../config/api";
-import axios from "axios";
 import { logData } from "../utils/console";
 import { useLocalStorage } from "./useLocalStorage";
 import { useEffect, useState } from "react";
 import { useRedirect } from "./useNavigate";
 import { EventsOnLocal } from "../helper/getUser";
+import api from "../config/axios";
 
 export const useEvent = () => {
   const [loading, setLoading] = useState(false);
@@ -20,7 +20,7 @@ export const useEvent = () => {
     try {
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.EVENT.ADD}`;
       // logData("fetchUrl", url);
-      const response = await axios.post(url, { addData });
+      const response = await api.post(url, { addData });
       // logData("response on add event", response);
       const event = response?.data?.event;
       // logData("event on add", event);
@@ -38,7 +38,7 @@ export const useEvent = () => {
     try {
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.EVENT.UPDATE}/${eventId}`;
       // logData("fetchUrl", url);
-      const response = await axios.put(url, { updateData });
+      const response = await api.put(url, { updateData });
       // logData("response on update event", response);
       const events = response?.data?.events;
       // logData("events on events", events);
@@ -56,7 +56,7 @@ export const useEvent = () => {
     try {
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.EVENT.GET_ALL}`;
       // logData("fetchUrl", url);
-      const response = await axios.get(url);
+      const response = await api.get(url);
       // logData("response on add event", response);
       const events = response?.data?.events;
       // logData("events on fetch", events);
@@ -74,7 +74,7 @@ export const useEvent = () => {
     try {
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.EVENT.GET_ALL_ACTIVE}`;
       // logData("fetchUrl", url);
-      const response = await axios.get(url);
+      const response = await api.get(url);
       // logData("response on add event", response);
       const events = response?.data?.events;
       // logData("events on fetch", events);
@@ -92,7 +92,7 @@ export const useEvent = () => {
     try {
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.EVENT.GET_ONE}/${eventId}`;
       // logData("fetchUrl", url);
-      const response = await axios.get(url);
+      const response = await api.get(url);
       // logData("response on add event", response);
       const event = response?.data?.event;
       // logData("event on fetch", event);
@@ -110,7 +110,7 @@ export const useEvent = () => {
     try {
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.EVENT.MARKE_ONE}/${eventId}`;
       // logData("fetchUrl", url);
-      const response = await axios.put(url, { isPublished });
+      const response = await api.put(url, { isPublished });
       // logData("response on add event", response);
       const event = response?.data?.event;
       // logData("event on fetch", event);
@@ -128,7 +128,7 @@ export const useEvent = () => {
     try {
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.EVENT.PUBLISH}/${eventId}`;
       // logData("fetchUrl", url);
-      const response = await axios.put(url, { isPublished });
+      const response = await api.put(url, { isPublished });
       // logData("response on add event", response);
       const event = response?.data?.event;
       // logData("event on fetch", event);
@@ -146,7 +146,7 @@ export const useEvent = () => {
     try {
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.EVENT.DELETE_ONE}/${eventId}`;
       // logData("fetchUrl", url);
-      const response = await axios.delete(url);
+      const response = await api.delete(url);
       logData("response on delete event", response);
       const message = response?.data?.message;
       logData("message on fetch", message);

@@ -6,6 +6,7 @@ import ImageUpload from "../../utils/imageUpload";
 import Button from "../../utils/button";
 import { memberOnLocal, userOnLocal } from "../../helper/getUser";
 import { logData } from "../../utils/console";
+import FileUpload from "../../utils/fileUpload";
 
 export const UpdateForm = ({ handleValidate, title }) => {
   const user = userOnLocal();
@@ -13,11 +14,12 @@ export const UpdateForm = ({ handleValidate, title }) => {
   const redirect = useRedirect();
   const [step, setStep] = useState(0);
   const finalUser = user ? user : member;
-  const [photo, setPhoto] = useState(user.photo || null);
-
+  // const [photo, setPhoto] = useState(user.photo || null);
+  // logData("photo", photo)
   const [form, setForm] = useState({
     firstName: finalUser.firstName || "",
     lastName: finalUser.lastName || "",
+    photo: finalUser.photo || null,
     dateNaissance: finalUser.birthDate ? finalUser.birthDate.split("T")[0] : "",
     sex: finalUser.sex || "",
     telephone: finalUser.number || "",
@@ -115,7 +117,15 @@ export const UpdateForm = ({ handleValidate, title }) => {
         <>
           <p className="font-semibold">Informations personnelles</p>
 
-          <ImageUpload onImageSelect={setPhoto} />
+          {/* <ImageUpload onImageSelect={setPhoto} /> */}
+          <FileUpload
+            label="Photo"
+            endpoint="image"
+            accept="image/*"
+            preview
+            value={form.photo}
+            onFileSelect={(url) => handleChange("photo", url)}
+          />
 
           <Input
             type="date"
@@ -191,10 +201,17 @@ export const UpdateForm = ({ handleValidate, title }) => {
             onChange={(e) => handleChange("matricule", e.target.value)}
           />
 
-          <Input
+          {/* <Input
             type="file"
             onChange={(e) => handleChange("document", e.target.files[0])}
-          />
+          /> */}
+          <FileUpload
+            label="Carte scolaire / CNI"
+            endpoint="document"
+            accept=".pdf,.jpg,.jpeg,.png"
+            value={form.document}
+            onFileSelect={(url) => handleChange("document", url)}
+         />
 
           <div className="flex justify-between gap-1">
             <Button children="Retour" onClick={prevStep} />

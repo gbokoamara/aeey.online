@@ -97,7 +97,7 @@ const Header = () => {
 
         <Button
             children={<><div className="flex items-center gap-4"><HeartHandshake size={40} color="#f906ac" /> <span className="hidden md:flex"> Faire un don</span></div></>}
-            className="w  "
+            className=" "
             onClick={handleSubmit}
           />
         <div

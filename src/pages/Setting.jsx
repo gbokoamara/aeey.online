@@ -18,12 +18,20 @@ import { userOnLocal } from "../helper/getUser";
 import { AddEvent } from "../component/events/eventForm";
 import { ExpensePage } from "../component/expenses/ExpensesComponent";
 import { Cotisation } from "../component/cotisation/Cotisation";
+import { useUser } from "../hooks/useUser";
+import { ArrowBigLeft } from "lucide-react";
 
 export const SettingPage = () => {
   const {logout} = useAuth()
   const navigate = useNavigate();
-  const user = userOnLocal()
-  logData("localUser ", user)
+  const localUser = userOnLocal()
+  const {loading, userOnApi, getUser} = useUser()
+  useEffect(() => {getUser()}, [localUser.id])
+  logData("userOnApi ", userOnApi)
+  let user = {};
+  if (userOnApi) {
+    user = userOnApi
+  } else { user = localUser}
 
   const [activeComponent, setActiveComponent] = useState(null);
 
@@ -58,13 +66,13 @@ export const SettingPage = () => {
   const showComponent = () => {
     switch (activeComponent) {
       case "carte":
-        return <CardPage />;
+        return <CardPage showBackButton={false}/>;
       case "history":
         return <UserPaymentHistoryPage />;
       case "members":
         return <ValidateMemberPage />;
       case "profil":
-        return <ProfilPage />;
+        return <ProfilPage user={user}/>;
       case "payments":
         return <AllPaymentsPage />;
       case "dashboard":
@@ -84,19 +92,20 @@ export const SettingPage = () => {
     logout(user);
   };
   
+  const btnClassName ="bg-gray-300/90  hover:bg-gray-600 hover:text-white w-full"
   return (
     <div className="min-h-screen grid md:grid-cols-8 p-2 gap-5">
-      <BackButton className="top-2" />
+      <BackButton className="top-2 text-white"  title="Paramètres" />
 
       {/* ================= MOBILE FULLSCREEN ================= */}
       {activeComponent && !isDesktop && (
-        <div className="md:hidden fixed inset-0 bg-white p-4 z-50 overflow-auto">
+        <div className="md:hidden fixed inset-0 bg-green-500 p-4 z-50 overflow-auto">
 
           <button
             onClick={handleBack}
-            className="mb-4 bg-black text-white px-3 py-1 rounded"
+            className="mb-4 bg-black text-white px-3 py-1 rounded flex gap-4"
           >
-            ← Retour
+            <ArrowBigLeft  /> <span className="font-bold font-serif ">Retour</span>
           </button>
 
           <div className="p-4 bg-slate-100 rounded-2xl shadow">
@@ -130,24 +139,28 @@ export const SettingPage = () => {
           </div>
 
           {/* USER ACTIONS */}
-          <div className="bg-white p-3 rounded-2xl shadow space-y-3">
-
+          <div className="bg-slate-50 p-3 rounded-2xl shadow space-y-3">
+             
             <Button
-              children="Profil"
+              className={btnClassName}
+              children="Mon Profil"
               onClick={() => handleClick("profil")}
             />
 
              <Button
+              className={btnClassName}
                 children="Le Bilan"
                 onClick={() => handleClick("payments")}
             />
 
             <Button
+              className={btnClassName}
               children="Demande carte"
               onClick={() => handleClick("carte")}
             />
 
             <Button
+              className={btnClassName}
               children="Mes paiements"
               onClick={() => handleClick("history")}
             />
@@ -156,29 +169,34 @@ export const SettingPage = () => {
 
           {/* ADMIN ACTIONS */}
           {isAdmin && (
-            <div className="bg-gray-900 text-white p-3 rounded-2xl shadow space-y-3">
+            <div className="bg-slate-50  p-3 rounded-2xl shadow space-y-3">
 
               <Button
-                children="Membres"
+                className={btnClassName}
+                children="Membres A.E.E.Y"
                 onClick={() => handleClick("members")}
               />
 
               <Button
+                className={btnClassName}
                 children="Tableau de bord"
                 onClick={() => handleClick("dashboard")}
               />
 
                <Button
-                children="Evenements"
+                className={btnClassName}
+                children="nos Evenements"
                 onClick={() => handleClick("events")}
               />
 
               <Button
+                className={btnClassName}
                 children="Gestion des dépenses"
                 onClick={() => handleClick("expenses")}
               />
 
               <Button
+                className={btnClassName}
                 children="Gestion des cautisations"
                 onClick={() => handleClick("cautisation")}
               />

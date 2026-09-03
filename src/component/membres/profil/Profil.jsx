@@ -8,9 +8,9 @@ import { useUser } from "../../../hooks/useUser"
 import { Modal } from "../../../utils/Modal"
 
 
-export const ProfilPage = () => {
+export const ProfilPage = ({user}) => {
   const [ activeModal, setActiveModal] = useState(false)
-    const user = userOnLocal()
+    const localUser = userOnLocal()
     const { update } = useUser()
 
     const handleValidate = (updateData) => {
@@ -46,7 +46,7 @@ export const ProfilPage = () => {
               <p>📍 {user.city}</p>
               <p>🏢 {user.occupation}</p>
               <p>📞 {user.number}</p>
-              <p>🆔 {user.numeroMembre}</p>
+              <p>🆔 {user.matricule}</p>
             </div>
           </div>
 
@@ -58,14 +58,14 @@ export const ProfilPage = () => {
               <p>
                 Cotisations :{" "}
                 <span className="font-bold">
-                  {user.cautisation?.length || 0}
+                  {user.payments?.length || 0}
                 </span>
               </p>
 
               <p>
                 Total :{" "}
                 <span className="font-bold">
-                  {user.cautisation?.reduce((a, b) => a + b.montant, 0)} FCFA
+                  {user.payments?.reduce((a, b) => a + b.amount, 0)} FCFA
                 </span>
               </p>
 
