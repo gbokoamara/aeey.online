@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -6,17 +5,17 @@ import Button from "../utils/button";
 import { logData } from "../utils/console";
 import { useExpense } from "../hooks/useExpense";
 import { useLocalStorage } from "../hooks/useLocalStorage";
+import BackButton from "../utils/backButton";
 
 export const ApprovedExpense = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const {getItem} = useLocalStorage()
+  const { getItem } = useLocalStorage();
   const token = getItem("token");
 
   const [loading, setLoading] = useState(true);
 
-  const { expense, getExpenseById, approveExpense, rejectExpense } =
-    useExpense();
+  const { vote, expense, processing, getExpenseById, approveExpense, rejectExpense } = useExpense();
 
   const getExpense = async () => {
     try {
@@ -29,7 +28,6 @@ export const ApprovedExpense = () => {
       }
 
       await getExpenseById(id);
-
     } catch (error) {
       console.error("get expense error:", error);
       console.log("get expense error:", error);
@@ -48,8 +46,7 @@ export const ApprovedExpense = () => {
       // }
 
       toast.error(
-        error.response?.data?.message ||
-          "Impossible de charger cette dépense"
+        error.response?.data?.message || "Impossible de charger cette dépense",
       );
     } finally {
       setLoading(false);
@@ -67,52 +64,54 @@ export const ApprovedExpense = () => {
   if (!expense) {
     return <p>Dépense introuvable</p>;
   }
-
+  console.log("vote", vote)
   return (
-    <div className="max-w-xl mx-auto p-6 bg-amber-50 rounded">
-      <h1 className="text-2xl font-bold mb-5">
-        Validation d'une dépense
-      </h1>
+    <>
+      <BackButton
+        className="top-5 left-0 text-white"
+        title={"Page d'accueil"}
+        show={true}
+      />
 
-      <div className="border rounded-xl p-5 space-y-3">
-        <p>
-          <strong>Titre :</strong> {expense.name}
-        </p>
+      <div className="max-w-xl mx-auto p-6 bg-amber-50 rounded">
+        <h1 className="text-2xl font-bold mb-5">Validation d'une dépense</h1>
 
-        <p>
-          <strong>Description :</strong>
-          <br />
-          {expense.description}
-        </p>
+        <div className="border rounded-xl p-5 space-y-3">
+          <p>
+            <strong>Titre :</strong> {expense.name}
+          </p>
 
-        <p>
-          <strong>Montant :</strong> {expense.amount} FCFA
-        </p>
+          <p>
+            <strong>Description :</strong>
+            <br />
+            {expense.description}
+          </p>
 
-        <p>
-          <strong>Demandeur :</strong> {expense.user?.name}
-        </p>
+          <p>
+            <strong>Montant :</strong> {expense.amount} FCFA
+          </p>
 
-        <p>
-          <strong>Status :</strong> {expense.status}
-        </p>
-      </div>
+          <p>
+            <strong>Demandeur :</strong> {expense.user?.name}
+          </p>
 
-      {expense.status === "PENDING" && (
-        <div className="flex gap-3 mt-6">
-          <Button
-            onClick={() => approveExpense(expense.id)}
-          >
-            Approuver
-          </Button>
-
-          <Button
-            onClick={() => rejectExpense(expense.id)}
-          >
-            ❌ Rejeter
-          </Button>
+          <p>
+            <strong>Status :</strong> {expense.status}
+          </p>
         </div>
-      )}
-    </div>
+
+        {expense.status === "PENDING" && vote !== "APPROVED" && vote !== "REJECTED" && (
+          <div className="flex gap-3 mt-6">
+            <Button onClick={() => approveExpense(expense.id)}>
+            {processing ? "... " : "Approuver"}  
+            </Button>
+
+            <Button onClick={() => rejectExpense(expense.id)}>
+              {processing ? "... " : "❌ Rejeter"} 
+            </Button>
+          </div>
+        )}
+      </div>
+    </>
   );
 };

@@ -14,6 +14,7 @@ import { EventDetail } from "./pages/EventDetails"
 import { PaymentsPage } from "./pages/PaymentsPage"
 import { ApprovedExpense } from "./pages/ApprovedExpense"
 import { ProjectPage } from "./pages/ProjectPage"
+import { Toaster } from "sonner"
 
 
 
@@ -41,6 +42,7 @@ function App() {
         <Route path="/project" element={<ProjectPage/>} />
     </Routes>
    </Router>
+   <Toaster position="top-right" richColors />
    </>
   )
 }

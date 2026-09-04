@@ -6,6 +6,8 @@ import { useRedirect } from "./useNavigate";
 import { EventsOnLocal } from "../helper/getUser";
 import { userOnLocal } from "../helper/getUser";
 import api from "../config/axios";
+import { formatError } from "../helper/errorHelper";
+import { toast } from "sonner";
 
 
 export const useExpense = () => {
@@ -14,6 +16,7 @@ export const useExpense = () => {
   const redirect = useRedirect();
   const [expenses, setExpenses] = useState([]);
   const [expense, setExpense] = useState(null);
+   const [vote, setVote] = useState(null);
   const [error, setError] = useState(null);
   // const expenses = ExpensesOnLocal();
   const user = userOnLocal();
@@ -114,14 +117,19 @@ export const useExpense = () => {
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.EXPENSE.APPROVE_ONE}/${expenseId}`;
       const response = await api.post(url);
       logData("response on update expense", response);
-      const message = response;
-      logData("message", message);
       await getExpense(expenseId);
-      // const expenses = response?.data?.expenses;
-      // setItem("expenses", expenses);
-      // setExpense(expenses);
+      const vote = response?.vote;
+      setVote(vote.status)
+      const message = response?.message;
+      toast.success(message);
     } catch (error) {
       console.error("login error", error);
+      const defaultMessage="Impossible d'approuver cette dépense"
+      const errorResponse = formatError(error, defaultMessage)
+      toast.error(errorResponse.message);
+      setVote(errorResponse.vote)
+      const message = response?.data?.message;
+      toast.success(message);
     } finally {
       setLoading(false);
     }
@@ -134,16 +142,23 @@ export const useExpense = () => {
       const response = await api.post(url);
       const expenses = response?.data?.expenses;
       await getExpense(expenseId);
-      // setItem("expenses", expenses);
-      // setExpense(expenses);
+      const vote = response?.vote;
+      setVote(vote.status)
+      const message = response?.message;
+      toast.success(message);
     } catch (error) {
       console.error("login error", error);
+      const defaultMessage="Impossible de cett rejeter cette dépense"
+      const errorResponse = formatError(error, defaultMessage)
+      toast.error(errorResponse.message);
+      setVote(errorResponse.vote)
     } finally {
       setLoading(false);
     }
   };
 
   return {
+    vote,
     error,
     loading,
     expense,
@@ -155,6 +170,7 @@ export const useExpense = () => {
     deleteExpense,
     approveExpense,
     rejectExpense,
+    processing:loading,
     getExpenseById: getExpense,
   };
 };
