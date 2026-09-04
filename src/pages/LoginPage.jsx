@@ -78,7 +78,7 @@ const handleCountryChange = ({ code, iso, name }) => {
                   countryName={form.countryName}
                   countryCode={form.countryCode}
                   countryIso={form.countryIso}
-                  defaultCountry="CI"
+                  defaultCountry="ci"
                   onCountryChange={handleCountryChange}
                   onChange={(e) =>
                     handleChange("number", e.target.value)

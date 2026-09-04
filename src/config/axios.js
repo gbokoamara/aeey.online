@@ -13,7 +13,7 @@ const api = axios.create({
 api.interceptors.request.use((config) => {
   const token = getItem("token");
 
-  console.log("token :", token);
+  // console.log("token :", token);
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -30,7 +30,7 @@ api.interceptors.response.use(
 
   (error) => {
     if (error.response?.status === 401) {
-      console.log("Token expiré ou invalide");
+      // console.log("Token expiré ou invalide");
 
       // Supprimer le token expiré
       removeItem("token");

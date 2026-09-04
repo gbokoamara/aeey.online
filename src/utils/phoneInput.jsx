@@ -103,7 +103,7 @@ const PhoneInput = ({
               />
 
               <span className="font-medium">
-                {selectedCountry.code}
+                {selectedCountry.code.toUpperCase()}
               </span>
 
               <span className="text-xs">
@@ -131,11 +131,11 @@ const PhoneInput = ({
                 />
 
                 <span className="flex-1 text-sm">
-                  {country.name}
+                  {country.name.toUpperCase()}
                 </span>
 
                 <span className="text-sm font-medium text-gray-600">
-                  {country.code}
+                  {country.code.toUpperCase()}
                 </span>
               </button>
             ))}
@@ -164,113 +164,3 @@ const PhoneInput = ({
 };
 
 export default PhoneInput;
-
-// import { useState } from "react";
-// import { countries } from "../helper/countries";
-
-// const PhoneInput = ({
-//   value,
-//   onChange,
-//   required = false,
-//   className = "",
-//   placeholder,
-//   countryName= "",
-//   countryCode = "+225",
-//   countryIso = "ci",
-//   onCountryChange,
-//   defaultCountry = "ci",
-//   ...props
-// }) => {
-//   const [isOpen, setIsOpen] = useState(false);
-
-//   // Pays actuellement sélectionné
-//   const selectedCountry =
-//     countries.find((country) => country.name === countryName) ||
-//     countries.find((country) => country.iso === countryIso) ||
-//     countries.find((country) => country.code === countryCode) ||
-//     countries.find((country) => country.iso === defaultCountry) ||
-//     countries[0];
-
-//   const handleSelectCountry = (country) => {
-//     setIsOpen(false);
-
-//     // On informe le parent du nouveau pays
-//     if (onCountryChange) {
-//       onCountryChange({
-//         name: country.name,
-//         code: country.code,
-//         iso: country.iso,
-//       });
-//     }
-//   };
-
-//   return (
-//     <div className="flex gap-2 w-full">
-//       {/* COUNTRY SELECT */}
-//       <div className="relative shrink-0">
-//         <button
-//           type="button"
-//           onClick={() => setIsOpen((prev) => !prev)}
-//           className="h-full min-w-27.5 flex items-center justify-center gap-2 px-3 py-2 border-2 border-gray-400 rounded-lg bg-white"
-//         >
-//           <img
-//             src={selectedCountry.flag}
-//             alt={selectedCountry.name}
-//             className="w-6 h-4 object-cover"
-//           />
-
-//           <span className="font-medium">
-//             {selectedCountry.code}
-//           </span>
-
-//           <span className="text-xs">
-//             {isOpen ? "▲" : "▼"}
-//           </span>
-//         </button>
-
-//         {/* DROPDOWN */}
-//         {isOpen && (
-//           <div className="absolute top-full left-0 mt-1 w-70 max-h-75 overflow-y-auto bg-white border border-gray-300 rounded-lg shadow-2xl z-9999">
-//             {countries.map((country) => (
-//               <button
-//                 key={country.iso}
-//                 type="button"
-//                 onClick={() => handleSelectCountry(country)}
-//                 className="w-full flex items-center gap-3 px-3 py-3 cursor-pointer hover:bg-gray-100 text-left"
-//               >
-//                 <img
-//                   src={country.flag}
-//                   alt={country.name}
-//                   className="w-7 h-5 object-cover shrink-0"
-//                 />
-
-//                 <span className="flex-1 text-sm">
-//                   {country.name}
-//                 </span>
-
-//                 <span className="text-sm font-medium text-gray-600">
-//                   {country.code}
-//                 </span>
-//               </button>
-//             ))}
-//           </div>
-//         )}
-//       </div>
-
-//       {/* PHONE NUMBER */}
-//       <input
-//         type="tel"
-//         placeholder={placeholder || "Numéro de téléphone"}
-//         value={value}
-//         onChange={onChange}
-//         required={required}
-//         className={` flex text-center w-full px-4 py-2 border-2 border-gray-400 rounded-lg outline-none focus:ring-2 focus:ring-blue-500
-//           ${className}
-//         `}
-//         {...props}
-//       />
-//     </div>
-//   );
-// };
-
-// export default PhoneInput;

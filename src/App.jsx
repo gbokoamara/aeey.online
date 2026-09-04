@@ -13,6 +13,7 @@ import { UserPaymentHistoryPage } from "./component/membres/payment/Payment"
 import { EventDetail } from "./pages/EventDetails"
 import { PaymentsPage } from "./pages/PaymentsPage"
 import { ApprovedExpense } from "./pages/ApprovedExpense"
+import { ProjectPage } from "./pages/ProjectPage"
 
 
 
@@ -37,6 +38,7 @@ function App() {
         <Route path="/event/:id" element={<EventDetail />} />
         <Route path="/payments" element={<PaymentsPage/>} />
         <Route path="/expenses/:id" element={<ApprovedExpense/>} />
+        <Route path="/project" element={<ProjectPage/>} />
     </Routes>
    </Router>
    </>
