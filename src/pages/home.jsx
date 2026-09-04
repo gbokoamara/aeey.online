@@ -116,7 +116,7 @@ export const HomePage = () => {
         </div>
 
         <div className=" flex flex-col gap-10 pt-24 bg-amber-50  md:pt-56 text-center w-full  h-auto  text-black justify-start items-center rounded-t-2xl ">
-          <div className="grid gap-5  w-screen md:w-3xl px-2">
+          <div className="grid gap-5  w-screen md:w-3xl px-2 text-center">
             {/* <AutoScroll axis="horizontal" speed={50} height={50} showPauseButton> */}
               <h1 className="font-bold font-serif text-lg">Bienvenue à l'Association des Élèves et Étudiants de Yaokro</h1>
             {/* </AutoScroll> */}

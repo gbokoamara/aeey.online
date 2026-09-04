@@ -22,7 +22,7 @@ const [form, setForm]=useState({
     number:"",
     countryName:"Côte d'Ivoire",
     countryCode:"+225",
-    countryIso:"CI",
+    countryIso:"ci",
 });
 
 const handleChange = (name, value) => {

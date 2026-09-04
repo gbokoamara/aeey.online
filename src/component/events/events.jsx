@@ -19,7 +19,7 @@ export const Events = () => {
   const navigate = useNavigate();
   return (
     <>
-      <div className="  w-screen md:w-3xl  p-2 rounded gap-2">
+      <div className=" w-screen md:w-3xl h-full  p-2 rounded gap-2">
       <AutoSlide ref={autoSlideRef}  interval={10000} >
         {events.length > 0 &&
           events?.map((event, index) => 
@@ -30,21 +30,18 @@ export const Events = () => {
             return (
             <div
               key={index}
-              className="bg-slate-100 py-1  rounded shrink-0 grid grid-cols-6 items-center relative pr-6 shadow"
+              className="bg-slate-100 py-1 h-full rounded shrink-0 grid grid-cols-6 items-center relative pr-6 shadow" // modification de la 
             >
               {/* Texte */}
               <div onClick={() => navigate(`/event/${event.id}`)}
                 className=" col-span-4 text-left p-2 flex flex-col  justify-between cursor-pointer">
                 <div>
                   <h1 className="font-semibold text-sm">{event.title}</h1>
-                  {/* { shouldScroll ? */}
-                  {/* //  (<AutoScroll  speed={10} height={36}> */}
-                  <p className="text-[12px] text-gray-600 ">
-                    {event.description} 
+                  <p className="text-[12px] text-gray-600">
+                    {event.description?.length > 80
+                      ? `${event.description.substring(0, 80)}...`
+                      : event.description}
                   </p>
-                  {/* // </AutoScroll>) : */}
-                   {/* <p className="text-[12px] text-gray-600 line-clamp-2"> {event.description}</p> */}
-                   {/* } */}
                 </div>
 
                 <p className="text-[11px] text-black ">
@@ -53,7 +50,7 @@ export const Events = () => {
               </div>
 
               {/* Image */}
-              <div className="h-32 col-span-2 p-2 flex items-center justify-center">
+              <div className="h-28 col-span-2 p-2 flex items-center justify-center">
                 <ImageFull
                   src={event.image}
                   className="h-full object-cover"
@@ -67,7 +64,7 @@ export const Events = () => {
                 </button>
 
                 <button
-                  className="hover:text-blue-500"
+                  className="hover:text-blue-500 bg-black rounded-2xl text-white"
                    onClick={() => autoSlideRef.current?.next()}
                 >
                   <ChevronRight size={24} />

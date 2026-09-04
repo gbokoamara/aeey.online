@@ -111,7 +111,7 @@ const AutoSlide = forwardRef(({ children, interval = 3000 }, ref) => {
   }, [interval, paused]);
 
   return (
-    <div className="relative">
+    <div className="relative h-10">
       {/* Bouton pause */}
       <button
         onClick={() => setPaused((p) => !p)}
@@ -147,7 +147,7 @@ const AutoSlide = forwardRef(({ children, interval = 3000 }, ref) => {
         style={{ overflow: "hidden" }}
       >
         {items.map((child, i) => (
-          <div key={i} className="snap-start shrink-0 w-full border-2 rounded border-amber-600">
+          <div key={i} className="snap-start shrink-0 h-40 w-full border-2 rounded border-amber-600">
             {child}
           </div>
         ))}
