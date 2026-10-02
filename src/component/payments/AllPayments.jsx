@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { PaymentCard } from "../cards/PaymentCard";
 import Pagination from "../../utils/pagination";
 import { usePayment } from "../../hooks/usePayment";
-import { Loading } from "../../utils/loading";
+import { Loading } from "../../utils/Loading";
 
 const AllPaymentsPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
