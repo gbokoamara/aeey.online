@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { pendingMembers } from "../../data/payment";
-import { useRedirect } from "../../hooks/useNavigate";
 import Input from "../../utils/input";
 import ImageUpload from "../../utils/imageUpload";
 import Button from "../../utils/button";
@@ -11,7 +9,6 @@ import FileUpload from "../../utils/fileUpload";
 export const UpdateForm = ({ handleValidate, title }) => {
   const user = userOnLocal();
   const member = memberOnLocal();
-  const redirect = useRedirect();
   const [step, setStep] = useState(0);
   const finalUser = user ? user : member;
   // const [photo, setPhoto] = useState(user.photo || null);
@@ -19,7 +16,7 @@ export const UpdateForm = ({ handleValidate, title }) => {
   const [form, setForm] = useState({
     firstName: finalUser.firstName || "",
     lastName: finalUser.lastName || "",
-    photo: finalUser.photo || null,
+    photo: finalUser.photo || "",
     dateNaissance: finalUser.birthDate ? finalUser.birthDate.split("T")[0] : "",
     sex: finalUser.sex || "",
     telephone: finalUser.number || "",
@@ -39,7 +36,7 @@ export const UpdateForm = ({ handleValidate, title }) => {
     dejaMembre: false,
     numeroMembre: finalUser.numeroMembre || "",
     section: finalUser.section || "",
-    certifie: false,
+    certifie: finalUser.certifie ||  false,
     poste: finalUser.poste || "",
     memberType: finalUser.memberType || "",
     statut: finalUser.memberStatus || "", // en_attente | refuse | valide
@@ -66,8 +63,9 @@ export const UpdateForm = ({ handleValidate, title }) => {
     nextStep();
   };
 
+  logData("form", form);
+
   const handleSubmit = () => {
-    logData("form", form);
     handleValidate(form);
   };
 
@@ -98,7 +96,16 @@ export const UpdateForm = ({ handleValidate, title }) => {
             type="tel"
             placeholder="Téléphone"
             value={form.telephone}
-            onChange={(e) => handleChangee("telephone", e.target.value)}
+            disabled
+            onChange={(e) => handleChange("telephone", e.target.value)}
+          />
+
+          <Input
+            type="email"
+            placeholder="Email"
+            value={form.email}
+             disabled={!!finalUser.email}
+            onChange={(e) => handleChange("email", e.target.value)}
           />
 
           <Button children="Continuer" onClick={checkUser} />
@@ -133,19 +140,17 @@ export const UpdateForm = ({ handleValidate, title }) => {
             onChange={(e) => handleChange("dateNaissance", e.target.value)}
           />
 
-          <Input
-            type="text"
-            placeholder="Sexe"
+          <select
+            name="Sexe"
+            id="Sexe"
+            className="w-full p-2 border rounded-md" // Ajoute tes classes de style ici
             value={form.sex}
             onChange={(e) => handleChange("sex", e.target.value)}
-          />
-
-          <Input
-            type="email"
-            placeholder="Email"
-            value={form.email}
-            onChange={(e) => handleChange("email", e.target.value)}
-          />
+          >
+            <option value="">Sexe</option>
+            <option value="H">HOMME</option>
+            <option value="F">FEMME</option>
+          </select>
 
           <Input
             type="text"
@@ -170,58 +175,6 @@ export const UpdateForm = ({ handleValidate, title }) => {
 
       {/* ---------------- STEP 2 ---------------- */}
       {step === 2 && (
-        <>
-          <p className="font-semibold">Informations académiques</p>
-
-          <Input
-            type="text"
-            placeholder="Établissement"
-            value={form.etablissement}
-            onChange={(e) => handleChange("etablissement", e.target.value)}
-          />
-
-          <Input
-            type="text"
-            placeholder="Niveau"
-            value={form.niveau}
-            onChange={(e) => handleChange("niveau", e.target.value)}
-          />
-
-          <Input
-            type="text"
-            placeholder="Filière"
-            value={form.filiere}
-            onChange={(e) => handleChange("filiere", e.target.value)}
-          />
-
-          <Input
-            type="text"
-            placeholder="Matricule"
-            value={form.matricule}
-            onChange={(e) => handleChange("matricule", e.target.value)}
-          />
-
-          {/* <Input
-            type="file"
-            onChange={(e) => handleChange("document", e.target.files[0])}
-          /> */}
-          <FileUpload
-            label="Carte scolaire / CNI"
-            endpoint="document"
-            accept=".pdf,.jpg,.jpeg,.png"
-            value={form.document}
-            onFileSelect={(url) => handleChange("document", url)}
-         />
-
-          <div className="flex justify-between gap-1">
-            <Button children="Retour" onClick={prevStep} />
-            <Button children="Suivant" onClick={nextStep} />
-          </div>
-        </>
-      )}
-
-      {/* ---------------- STEP 3 ---------------- */}
-      {step === 3 && (
         <>
           <p className="font-semibold">Justificatif (carte scolaire ou cni) </p>
 
@@ -268,6 +221,54 @@ export const UpdateForm = ({ handleValidate, title }) => {
             </>
           )}
 
+          { ["ETUDIANT", "ELEVE"].includes(form.memberType) && (
+            <>
+              <p className="font-semibold">Informations académiques</p>
+
+              <Input
+                type="text"
+                placeholder="Établissement"
+                value={form.etablissement}
+                onChange={(e) => handleChange("etablissement", e.target.value)}
+              />
+
+              <Input
+                type="text"
+                placeholder="Niveau"
+                value={form.niveau}
+                onChange={(e) => handleChange("niveau", e.target.value)}
+              />
+
+              <Input
+                type="text"
+                placeholder="Filière"
+                value={form.filiere}
+                onChange={(e) => handleChange("filiere", e.target.value)}
+              />
+
+              <Input
+                type="text"
+                placeholder="Matricule"
+                value={form.matricule}
+                onChange={(e) => handleChange("matricule", e.target.value)}
+              />
+
+              
+              <FileUpload
+                label="Carte scolaire / CNI"
+                endpoint="document"
+                accept=".pdf,.jpg,.jpeg,.png"
+                value={form.document}
+                onFileSelect={(url) => handleChange("document", url)}
+            />
+
+              <div className="flex justify-between gap-1">
+                <Button children="Retour" onClick={prevStep} />
+                <Button children="Suivant" onClick={nextStep} />
+              </div>
+            </>
+          )}
+
           <div className="flex justify-between gap-1">
             <Button children="Retour" onClick={prevStep} />
             <Button children="Suivant" onClick={nextStep} />
@@ -275,8 +276,8 @@ export const UpdateForm = ({ handleValidate, title }) => {
         </>
       )}
 
-      {/* ---------------- STEP 4 ---------------- */}
-      {step === 4 && (
+      {/* ---------------- STEP 3 ---------------- */}
+      {step === 3 && (
         <>
           <p className="font-semibold">Lien avec l'association</p>
 
@@ -297,7 +298,8 @@ export const UpdateForm = ({ handleValidate, title }) => {
           <label className="flex items-center gap-2 text-sm">
             <input
               type="checkbox"
-              value={form.certifie}
+              // value={form.certifie}
+              checked={form.certifie === true}
               onChange={(e) => handleChange("certifie", e.target.checked)}
             />
             Je certifie que les informations sont exactes

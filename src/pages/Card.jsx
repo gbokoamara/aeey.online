@@ -10,22 +10,31 @@ import { userOnLocal } from "../helper/getUser";
 import { useCard } from "../hooks/useCard";
 import FileUpload from "../utils/fileUpload";
 import { PagesCard } from "../component/pages/PagesCard";
+import {Loading} from '../utils/Loading'
+import { useAdministration } from "../hooks/useAdministration";
+import { handleVerification, toastWarning } from "../helper/toasterHelper";
 
 export const CardPage = ({showBackButton=true}) => {
   const user = userOnLocal();
-
+  const [verificationAsked, setVerificationAsked] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [photo, setPhoto] = useState(null);
   const [number, setNumber] = useState("");
 
   const { goTo } = useAppNavigation();
-  const { card, error, getRequestCard, requestCard } = useCard();
+  const { loading, card, error, getRequestCard, requestCard } = useCard();
+  const {management, getManagement } = useAdministration()
+  const cardAmount = management?.cardAmount
+  const verificationMessage = "Voulez-vous demander la vérification de vos informations ?" ;
+  const verificationUrl = "/membre"
+  console.log("cardAmount", cardAmount);
 
   const userId = user?.id;
 
   // Chargement de la demande existante
   useEffect(() => {
+    getManagement()
     if (userId) {
       getRequestCard(userId);
     }
@@ -56,6 +65,19 @@ export const CardPage = ({showBackButton=true}) => {
 
   // Création de la demande
   const handleShowCard = async () => {
+    
+    if (!cardData.firstName) {
+        return toastWarning("Nom obligatoire !");
+    }
+    if (!cardData.lastName) {
+        return toastWarning("Prenoms obligatoire !");
+    }
+    if (!cardData.number) {
+        return toastWarning("Numero de téléphone  obligatoire !");
+    }
+    if (!cardData.photo) {
+        return toastWarning(" photo  obligatoire !");
+    }
     const requestedCard = await requestCard(cardData);
 
     if (requestedCard) {
@@ -73,11 +95,33 @@ export const CardPage = ({showBackButton=true}) => {
           lastName,
         },
         photo,
-        montant: 2000,
+        montant: cardAmount,
         card,
       },
     });
   };
+
+  const handleManualInput = (setter, value) => {
+if (!user?.isMember && !verificationAsked) {
+  if (!verificationAsked) {
+  setVerificationAsked(true);
+    handleVerification(
+        verificationMessage,
+          () => goTo(verificationUrl),
+          () => setVerificationAsked(false)
+    );
+  }
+return;
+}
+
+setter(value);
+
+};
+
+
+  if (loading) {
+    return <Loading text="Chargement de la carte membre en cours ..." />
+  }
 
   return (
     <>
@@ -101,22 +145,19 @@ export const CardPage = ({showBackButton=true}) => {
             type="tel"
             placeholder="Numéro"
             value={number}
-            onChange={(e) => setNumber(e.target.value)}
-          />
+            onChange={(e) => setNumber(e.target.value)}/>
 
           <Input
             type="text"
             placeholder="Nom"
             value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-          />
+            onChange={(e) => handleManualInput( setFirstName , e.target.value )} />
 
           <Input
             type="text"
             placeholder="Prénom"
             value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-          />
+            onChange={(e) => handleManualInput( setLastName , e.target.value ) } />
 
           <Button
             children="Générer ma carte"
@@ -152,7 +193,7 @@ export const CardPage = ({showBackButton=true}) => {
           </div>
 
           <p className="font-bold text-lg">
-            Montant à payer : 2 000 FCFA
+            Montant à payer : { cardAmount || 2000 } FCFA
           </p>
 
           <Button

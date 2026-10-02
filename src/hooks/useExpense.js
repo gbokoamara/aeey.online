@@ -1,24 +1,23 @@
 import { API_CONFIG } from "../config/api";
-import { logData } from "../utils/console";
 import { useLocalStorage } from "./useLocalStorage";
-import { useEffect, useState } from "react";
-import { useRedirect } from "./useNavigate";
-import { EventsOnLocal } from "../helper/getUser";
+import {  useState } from "react";
 import { userOnLocal } from "../helper/getUser";
 import api from "../config/axios";
 import { formatError } from "../helper/errorHelper";
 import { toast } from "sonner";
+import { toastError, toastInfo } from "../helper/toasterHelper";
 
 
 export const useExpense = () => {
   const [loading, setLoading] = useState(false);
-  const { setItem, removeItem } = useLocalStorage();
-  const redirect = useRedirect();
+  const [loadingApproved, setLoadingApproved] = useState(false);
+  const { setItem } = useLocalStorage();
   const [expenses, setExpenses] = useState([]);
   const [expense, setExpense] = useState(null);
-   const [vote, setVote] = useState(null);
-  const [error, setError] = useState(null);
-  // const expenses = ExpensesOnLocal();
+  const [vote, setVote] = useState(null);
+  const [stats, setStats] = useState(null);
+  const [approvedStats, setApprovedStats] = useState(null);
+  const [approvedExpenses, setApprovedExpenses] = useState([]);
   const user = userOnLocal();
   const userId = user.id;
 
@@ -26,11 +25,8 @@ export const useExpense = () => {
     setLoading(true);
     try {
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.EXPENSE.ADD}/${userId}`;
-      logData("fetchUrl", url);
       const response = await api.post(url, { addData });
-      logData("response on add expense", response);
       const expense = response?.data?.expense;
-      logData("expense on add", expense);
       setItem("expense", expense);
       return expense;
     } catch (error) {
@@ -44,11 +40,8 @@ export const useExpense = () => {
     setLoading(true);
     try {
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.EXPENSE.UPDATE}/${expenseId}`;
-      logData("fetchUrl", url);
       const response = await api.put(url, { updateData });
-      logData("response on update expense", response);
       const expenses = response?.data?.expenses;
-      logData("expenses on expenses", expenses);
       setItem("expenses", expenses);
       setExpense(expenses);
     } catch (error) {
@@ -62,12 +55,12 @@ export const useExpense = () => {
     setLoading(true);
     try {
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.EXPENSE.GET_ALL}`;
-      logData("fetchUrl", url);
       const response = await api.get(url);
-      logData("response on add expense", response);
+      
       const expenses = response?.data?.expenses;
-      logData("expenses on fetch", expenses);
+      const stats = response?.data?.stats;
       setItem("expenses", expenses);
+      setStats(stats)
       setExpenses(expenses);
     } catch (error) {
       console.error("login error", error);
@@ -76,15 +69,30 @@ export const useExpense = () => {
     }
   };
 
+  const getApprovedExpense = async () => {
+    setLoadingApproved(true);
+    try {
+      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.EXPENSE.GET_APPROVED}`;
+      const response = await api.get(url);
+      const expenses = response?.data?.expenses;
+      const expenseStats = response?.data?.expenseStats;
+      setApprovedStats(expenseStats)
+      setApprovedExpenses(expenses);
+    } catch (error) {
+      console.error("login error", error);
+      const errorMessage = error?.response?.data?.message;
+      toastError(errorMessage)
+    } finally {
+      setLoadingApproved(false);
+    }
+  };
+
   const getExpense = async (expenseId) => {
     setLoading(true);
     try {
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.EXPENSE.GET_ONE}/${expenseId}`;
-      logData("fetchUrl", url);
       const response = await api.get(url);
-      logData("response on add expense", response);
       const expense = response?.data?.expense;
-      logData("expense on fetch", expense);
       setItem("expense", expense);
       setExpense(expense);
     } catch (error) {
@@ -98,12 +106,9 @@ export const useExpense = () => {
     setLoading(true);
     try {
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.EXPENSE.DELETE_ONE}/${expenseId}`;
-      logData("fetchUrl", url);
       const response = await api.delete(url);
-      logData("response on delete expense", response);
       const message = response?.data?.message;
-      logData("message on fetch", message);
-      // setItem("expense", expense)
+      toastInfo(message)
     } catch (error) {
       console.error("login error", error);
     } finally {
@@ -116,17 +121,17 @@ export const useExpense = () => {
     try {
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.EXPENSE.APPROVE_ONE}/${expenseId}`;
       const response = await api.post(url);
-      logData("response on update expense", response);
-      await getExpense(expenseId);
-      const vote = response?.vote;
-      setVote(vote.status)
-      const message = response?.message;
+      const vote = response?.data?.vote;
+      const message = response?.data?.message;
+      const result = response?.data?.result
+      setVote(vote)
       toast.success(message);
+      return result;
     } catch (error) {
       console.error("login error", error);
       const defaultMessage="Impossible d'approuver cette dépense"
       const errorResponse = formatError(error, defaultMessage)
-      toast.error(errorResponse.message);
+      // toast.error(errorResponse.message);
       setVote(errorResponse.vote)
       const message = response?.data?.message;
       toast.success(message);
@@ -140,18 +145,14 @@ export const useExpense = () => {
     try {
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.EXPENSE.REJECT_ONE}/${expenseId}`;
       const response = await api.post(url);
-      const expenses = response?.data?.expenses;
-      await getExpense(expenseId);
-      const vote = response?.vote;
-      setVote(vote.status)
-      const message = response?.message;
+      const vote = response?.data?.vote;
+      const message = response?.data?.message;
+      const result = response?.data?.result;
+      setVote(vote)
       toast.success(message);
+      return result ;
     } catch (error) {
       console.error("login error", error);
-      const defaultMessage="Impossible de cett rejeter cette dépense"
-      const errorResponse = formatError(error, defaultMessage)
-      toast.error(errorResponse.message);
-      setVote(errorResponse.vote)
     } finally {
       setLoading(false);
     }
@@ -159,10 +160,14 @@ export const useExpense = () => {
 
   return {
     vote,
-    error,
+    stats,
     loading,
     expense,
     expenses,
+    loadingApproved,
+    approvedExpenses,
+    processing:loading,
+    approvedStats,
     getExpense,
     addExpense,
     updateExpense,
@@ -170,7 +175,7 @@ export const useExpense = () => {
     deleteExpense,
     approveExpense,
     rejectExpense,
-    processing:loading,
     getExpenseById: getExpense,
+    getApprovedExpense,
   };
 };

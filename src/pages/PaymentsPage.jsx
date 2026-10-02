@@ -1,10 +1,5 @@
 
 import { useEffect, useState } from "react";
-// import { expenses } from "../data/payment";
-import BackButton from "../utils/backButton";
-import { BanknoteArrowDown, X } from "lucide-react";
-import { useExpense } from "../hooks/useExpense";
-import { dateUi } from "../helper/date";
 import PaymentList from "../component/payments/Payment";
 import { usePayment } from "../hooks/usePayment";
 import { PagesCard } from "../component/pages/PagesCard";

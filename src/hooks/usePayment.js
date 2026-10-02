@@ -13,6 +13,7 @@ export const usePayment = () => {
     const [ payment, setPayment ] = useState(null);
     const [ payments, setPayments ] = useState([]);
     const [ userPayments, setUserPayments ] = useState([]);
+    const [ paymentStats, setPaymentStats ] = useState(null);
     const [ stats, setStats ] = useState(null);
     const {setItem, removeItem} = useLocalStorage();
     
@@ -25,14 +26,11 @@ export const usePayment = () => {
         setLoading(true)
         try {
             const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PAYMENT.ADD}/${userId}`
-            // logData("fetchUrl", url)
             const response = await api.post(url, {addData})
-            // logData("response on add", response)
-            const payment = response?.data?.payment
-            // logData("paymentData on login", payment)
+            const {payment, record, fusionPay} = response?.data;
             setItem("payment", payment)
             setPayment(payment)
-            return payment
+            return {payment, record, fusionPay}
         } catch (error) {
             console.error("login error", error)
             setError(error)
@@ -65,11 +63,11 @@ export const usePayment = () => {
         setLoading(true)
         try {
             const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PAYMENT.GET_BY_USERID}/${userId}`
-            logData("passUrl", url)
+            // logData("passUrl", url)
             const response = await api.get(url)
-            logData("response on pass", response)
+            // logData("response on pass", response)
             const payments = response?.data?.payments
-            logData("paymentsData on pass", payments)
+            // logData("paymentsData on pass", payments)
             setItem("payments", payments)
             setUserPayments(payments)
         } catch (error) {
@@ -84,13 +82,12 @@ export const usePayment = () => {
         setLoading(true)
         try {
             const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.PAYMENT.GET_ALL}`
-            // logData("passUrl", url)
             const response = await api.get(url)
-            // logData("response on pass", response)
+            const paymentStats = response?.data?.paymentStats
             const payments = response?.data?.payments
-            // logData("paymentsData on pass", payments)
             setItem("payments", payments)
             setPayments(payments)
+            setPaymentStats(paymentStats)
         } catch (error) {
             setError(error)
             console.error("login error", error)
@@ -125,6 +122,7 @@ export const usePayment = () => {
         payment,
         payments,
         userPayments,
+        paymentStats,
         addPayment,
         getPayment, 
         getAllPayments,

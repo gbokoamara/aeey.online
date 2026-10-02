@@ -1,52 +1,33 @@
 import { useState } from "react";
 import "../App.css";
-import Button from "../utils/button";
-import Input from "../utils/input";
-import { useLocation, useNavigate } from "react-router-dom";
-// import ImageFull from '../utils/Image'
 import CarteMembreAEEY from "../component/membres/Carte/CarteMembreAEEY";
 import IconNav from "../component/services/nav";
-// import PaymentList from '../component/membres/payment/Payment'
-// import { payments } from "../data/payment";
 import { useAppNavigation } from "../hooks/useAppNavigation";
 import PaymentList from "../component/payments/Payment";
 import { useLocalStorage } from "../hooks/useLocalStorage";
-import { logData } from "../utils/console";
 import { useEffect } from "react";
 import PinInput from "../utils/pinInput";
 import { useAuth } from "../hooks/useAuth";
 import { userOnLocal } from "../helper/getUser";
 import { Events } from "../component/events/events";
-import { AutoScroll } from "../utils/autoScroll";
 import { usePayment } from "../hooks/usePayment";
 import { checkPaymentStatus } from "../config/checkPaymentStatus";
 import { useWebhook } from "../hooks/useWebhook";
 import { useCard } from "../hooks/useCard";
+import { Loading } from "../utils/Loading";
 
 export const HomePage = () => {
-  const [showCreatePin, setShowCreatePin] = useState(false);
-  const { getItem, setItem } = useLocalStorage();
-  const { getState } = useAppNavigation();
-  const state = getState();
-  if (state) {
-    // console.log("state at home :=>", state);
-  }
+  
   const user = userOnLocal();
   const { createPin } = useAuth();
-  // logData("userData at home", user);
-    const {
-        error,
-        loading,
-        payment,
-        payments,
-        addPayment,
-        getPayment, 
-        getAllPayments,
-        } = usePayment();
-
-    const {checkPayment} = useWebhook();
-    const {getRequestCard} = useCard()
-
+  const {checkPayment} = useWebhook();
+  const {getRequestCard} = useCard()
+  const { setItem } = useLocalStorage();
+  const { getState } = useAppNavigation();
+  const [showCreatePin, setShowCreatePin] = useState(false);
+  const { loading, payments, getAllPayments,} = usePayment();
+  
+  const state = getState();
 
   useEffect(() => {
     getAllPayments()
@@ -59,11 +40,8 @@ export const HomePage = () => {
   }, [user]);
 
   const handleCreatePin = async (pin) => {
-    // console.log("Nouveau PIN:", pin);
-
     // API backend
     const updatedUser = await createPin(pin, user.id);
-    // logData("user modifié", updatedUser);
     setItem("user", updatedUser);
 
     setShowCreatePin(false);
@@ -81,13 +59,10 @@ export const HomePage = () => {
       const params = new URLSearchParams(window.location.search);
       const token = params.get("token");
 
-      console.log("TOKEN =>", token);
-
       if (!token) return;
 
       try {
         const paymentDetails = await checkPaymentStatus(token);
-        console.log("paymentDetails", paymentDetails);
         if (paymentDetails) {
           const status = await checkPayment(paymentDetails?.data);
           if (status === true) {
@@ -102,9 +77,13 @@ export const HomePage = () => {
     fetchPaymentStatus();
   }, []);
 
+  if (loading) {
+  return <Loading fullScreen text="Chargement de vos données..." />;
+ }
+
   return (
     <>
-      <section className="relative bg-green-600 grid  h-full  ">
+      <section className="relative bg-green-600 grid  min-h-screen  ">
         <div className="h-36 "></div>
         <div className="bg-blue-400 h-40 md:h-70 w-[70%] md:w-[40%] absolute rounded-2xl z-30 top-16 left-1/2 -translate-x-1/2 ">
           <CarteMembreAEEY
@@ -115,17 +94,17 @@ export const HomePage = () => {
           />
         </div>
 
-        <div className=" flex flex-col gap-10 pt-24 bg-amber-50  md:pt-56 text-center w-full  h-auto  text-black justify-start items-center rounded-t-2xl ">
-          <div className="grid gap-5  w-screen md:w-3xl px-2 text-center">
+        <div className=" flex flex-col  pt-24 bg-amber-50  md:pt-56 text-center w-full  min-h-screen text-black justify-start items-center rounded-t-2xl ">
+          <div className="grid gap-5 pb-2  w-screen md:w-3xl px-1 text-center">
             {/* <AutoScroll axis="horizontal" speed={50} height={50} showPauseButton> */}
-              <h1 className="font-bold font-serif text-lg">Bienvenue à l'Association des Élèves et Étudiants de Yaokro</h1>
+              <h1 className="font-bold font-serif text-lg ">Bienvenue à l'Association des Élèves et Étudiants de Yaokro</h1>
             {/* </AutoScroll> */}
             <IconNav />
           </div>
-          <div>
+          <div className="h-44">
             <Events />
           </div>
-          <div className="  w-screen md:w-3xl  p-2 rounded gap-2"
+          <div className="  w-screen md:w-3xl px-1 py-2 rounded gap-2"
           // className=" w-[95%] md:w-[65%] lg:w-[40%]"
           >
             <PaymentList payments={payments} />
@@ -139,10 +118,7 @@ export const HomePage = () => {
             <p className="text-sm text-gray-500 mb-4">
               Ce code vous permettra d'accéder à votre solde
             </p>
-
             <PinInput length={4} onComplete={handleCreatePin} />
-
-            {/* ❌ pas de bouton annuler ici → obligatoire */}
           </div>
         </div>
       )}

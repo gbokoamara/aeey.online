@@ -8,6 +8,7 @@ import { useExpense } from "../../hooks/useExpense";
 import { ExpenseCard } from "./ExpenseCard";
 import PhoneInput from "../../utils/phoneInput";
 import axios from "axios"
+import { Loading } from "../../utils/Loading";
 
 const methods = [
 {
@@ -111,24 +112,44 @@ const [form, setForm]=useState({
     setActiveModal(false);
   };
 
-  const handleSubmit = async () => {
-    try {
-      if (reschedule === "Modifier") {
-        await updateExpense(selectedExpense.id, form);
-        logData("form & id", form)
-        // alert("Expense modifié !");
-      } else {
-        await addExpense(form);
-        // alert("Expense ajouté !");
-        logData("form", form)
+const handleSubmit = async () => {
+  try {
+    // Vérification des champs obligatoires
+    const requiredFields = {
+      countryCode: "Code pays",
+      phoneNumber: "Téléphone",
+      amount: "Montant",
+      method: "Mode",
+    };
+
+    for (const [field, label] of Object.entries(requiredFields)) {
+      if (
+        form[field] === undefined ||
+        form[field] === null ||
+        form[field] === "" ||
+        (typeof form[field] === "string" && !form[field].trim())
+      ) {
+        console.error(`${label} est requis`);
+        return;
       }
-      resetForm();
-      getAllExpenses();
-      setReschedule(false);
-    } catch (err) {
-      console.error(err);
     }
-  };
+
+    if (reschedule === "Modifier") {
+      await updateExpense(selectedExpense.id, form);
+      logData("form & id", form);
+    } else {
+      await addExpense(form);
+      logData("form", form);
+    }
+
+    resetForm();
+    getAllExpenses();
+    setReschedule(false);
+
+  } catch (err) {
+    console.error(err);
+  }
+};
 
 const handleCountryChange = ({ code, iso, name }) => {
   setForm((prev) => ({
@@ -214,7 +235,7 @@ const rejectedCount = safeExpenses.filter(
 ).length;
 
   if (loading) {
-    return <div>Chargement en cours ...</div>;
+    return <Loading />;
   }
 
 const selectedCountry = methods.find( (country) => country.code === form.countryIso);
@@ -387,13 +408,12 @@ const availableMethods = selectedCountry?.paymentMethods || [];
               </div>
 
               <div className="flex gap-2">
-                <Button onClick={handleSubmit}>{submitTitle()}</Button>
-
                 {reschedule && (
                   <Button onClick={resetForm} variant="secondary" className="bg-gray-400 px-4 py-2 w-full" >
                     Annuler
                   </Button>
                 )}
+                <Button onClick={handleSubmit}>{submitTitle()}</Button>
               </div>
             </div>
           </Modal>

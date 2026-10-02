@@ -1,33 +1,31 @@
+// import { useNavigate } from "react-router-dom";
+// import { user } from "../data/payment";
+// import { ValidateMemberPage } from "../component/membres/validate/ValidateMember";
+// import { logData } from "../utils/console";
+
 
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-// import { user } from "../data/payment";
 import BackButton from "../utils/backButton";
 import Button from "../utils/button";
-
 import { CardPage } from "./Card";
 import { UserPaymentHistoryPage } from "../component/membres/payment/Payment";
-import { ValidateMemberPage } from "../component/membres/validate/ValidateMember";
 import { ProfilPage } from "../component/membres/profil/Profil";
 import AllPaymentsPage from "../component/payments/AllPayments";
 import { Dashboard } from "../component/dashboard/Dashboard";
 import { useAuth } from "../hooks/useAuth";
-import { useLocalStorage } from "../hooks/useLocalStorage";
-import { logData } from "../utils/console";
 import { userOnLocal } from "../helper/getUser";
 import { AddEvent } from "../component/events/eventForm";
 import { ExpensePage } from "../component/expenses/ExpensesComponent";
 import { Cotisation } from "../component/cotisation/Cotisation";
 import { useUser } from "../hooks/useUser";
 import { ArrowBigLeft } from "lucide-react";
+import { MembersPage } from "../component/membres/validate/MembersPage";
 
 export const SettingPage = () => {
   const {logout} = useAuth()
-  const navigate = useNavigate();
   const localUser = userOnLocal()
   const {loading, userOnApi, getUser} = useUser()
   useEffect(() => {getUser()}, [localUser.id])
-  logData("userOnApi ", userOnApi)
   let user = {};
   if (userOnApi) {
     user = userOnApi
@@ -36,6 +34,7 @@ export const SettingPage = () => {
   const [activeComponent, setActiveComponent] = useState(null);
 
   const isAdmin = user.role === "ADMIN";
+  const isMember = user.isVerify === true ;
 
   // detect responsive
   const isDesktop = window.innerWidth >= 768;
@@ -65,14 +64,14 @@ export const SettingPage = () => {
 
   const showComponent = () => {
     switch (activeComponent) {
+      case "profil":
+        return <ProfilPage user={user}/>;
       case "carte":
         return <CardPage showBackButton={false}/>;
       case "history":
         return <UserPaymentHistoryPage />;
       case "members":
-        return <ValidateMemberPage />;
-      case "profil":
-        return <ProfilPage user={user}/>;
+        return <MembersPage />;
       case "payments":
         return <AllPaymentsPage />;
       case "dashboard":
@@ -92,7 +91,7 @@ export const SettingPage = () => {
     logout(user);
   };
   
-  const btnClassName ="bg-gray-300/90  hover:bg-gray-600 hover:text-white w-full"
+  const btnClassName ="bg-gray-300/90 text-left  hover:bg-gray-600 hover:text-white w-full"
   return (
     <div className="min-h-screen grid md:grid-cols-8 p-2 gap-5">
       <BackButton className="top-2 text-white"  title="Paramètres" />
@@ -118,7 +117,7 @@ export const SettingPage = () => {
       {/* ================= SIDEBAR ================= */}
       <div className="col-span-2">
 
-        <div className="text-center mt-10 bg-white rounded-2xl p-3">
+        <div className="flex justify-around md:block items-center mt-10 bg-white rounded-2xl p-3">
           <h1 className="text-2xl font-bold">Paramètres</h1>
           <p className="text-gray-500 text-sm">
             Espace d’administration
@@ -167,15 +166,20 @@ export const SettingPage = () => {
 
           </div>
 
-          {/* ADMIN ACTIONS */}
-          {isAdmin && (
+          {/* MEMBER ACTIONS */}
+          {isMember && (
             <div className="bg-slate-50  p-3 rounded-2xl shadow space-y-3">
-
-              <Button
+                <Button
                 className={btnClassName}
                 children="Membres A.E.E.Y"
                 onClick={() => handleClick("members")}
               />
+            </div>
+          )}
+
+          {/* ADMIN ACTIONS */}
+          {isAdmin && (
+            <div className="bg-slate-50  p-3 rounded-2xl shadow space-y-3">
 
               <Button
                 className={btnClassName}

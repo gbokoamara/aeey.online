@@ -9,21 +9,28 @@ import { usePayment } from "../hooks/usePayment";
 import { formatNumber } from "../helper/formatNumber";
 import Button from "../utils/button";
 import { useAppNavigation } from "../hooks/useAppNavigation";
+import { toastError, toastWarning } from "../helper/toasterHelper";
+import { useAdministration } from "../hooks/useAdministration";
 
 const Header = () => {
-  const { verifyPin } = useAuth();
+  const { verifyPin, changePin } = useAuth();
   const [showBalance, setShowBalance] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [showPinInput, setShowPinInput] = useState(false);
   const [isUnlocked, setIsUnlocked] = useState(false);
+  const [edit, setEdit] = useState(false);
+  const [pinKey, setPinKey] = useState(0);
+
   const { getItem } = useLocalStorage();
   const user = getItem("user");
   const {stats, getPaymentStat} = usePayment()
+  const {loading, management, getManagement} = useAdministration()
   const { goTo } = useAppNavigation();
   
   // logData("stats", stats)
   useEffect(() => {
-    getPaymentStat()
+    getPaymentStat();
+    getManagement()
   }, [])
 
   const timeoutRef = useRef(null); // pour gérer le timer
@@ -46,29 +53,44 @@ const Header = () => {
     setShowBalance(!showBalance);
   };
 
-  //  Quand le PIN est correct
   const handlePinComplete = async (pin) => {
-    // logData("pin", pin);
-    const isMatch = await verifyPin(pin, user?.id);
-    if (isMatch === true) {
+  try {
+    let isMatch = false;
+
+    if (edit === true) {
+      const newPin = pin;
+      isMatch = await changePin(newPin, user?.id);
+      setShowPinInput(false);
+      setEdit(false)
+    } else {
+      isMatch = await verifyPin(pin, user?.id);
+      if (isMatch === true) {
       setIsUnlocked(true);
       setShowBalance(true);
       setShowPinInput(false);
 
-      //  Reset timer si déjà existant
+      // Réinitialiser le timer précédent
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
 
-      // ⏱️ verrouillage après 30 secondes
+      // Verrouillage automatique après 30 secondes
       timeoutRef.current = setTimeout(() => {
         setIsUnlocked(false);
         setShowBalance(false);
-      }, 30000); // 30 000 ms = 30s
+      }, 30000);
     } else {
-      alert("Code incorrect");
+      toastError("PIN incorrect");
+      setPinKey((prev) => prev + 1);
     }
-  };
+    }
+
+  } catch (error) {
+    console.error("Erreur lors de la vérification du PIN :", error);
+    toastError("Une erreur est survenue");
+  }
+};
+
 
   //  Nettoyage (important)
   useEffect(() => {
@@ -110,7 +132,7 @@ const Header = () => {
           <div className="font-semibold text-2xl">
             {showBalance ? (
               <>
-               {stats ? formatNumber(stats?.totalAmount) : "35 000"}  <span className="text-sm">F CFA</span>
+               {management ? formatNumber(management?.solde) : "35 000"}  <span className="text-sm">F CFA</span>
               </>
             ) : (
               "•••••••••"
@@ -135,17 +157,25 @@ const Header = () => {
           showCloseButton={false}
         >
           <h2 className="mb-4 font-semibold text-center">
-            Entrer votre code PIN
+          {edit ? "Entrer votre nouveau code pin" : "Entrer votre code code pin"}  
           </h2>
 
-          <PinInput length={4} onComplete={handlePinComplete} />
+          <PinInput key={pinKey} length={4} onComplete={handlePinComplete} />
 
-          <button
-            onClick={() => setShowPinInput(false)}
+          <div className="flex ">
+            <button
+            onClick={() => {setShowPinInput(false), setEdit(false) }}
             className="mt-4 text-sm text-gray-500 block mx-auto"
           >
             Annuler
           </button>
+          <button
+            onClick={() => {setShowPinInput(true), setEdit(true), toastWarning("Vous êtes sur le point de changer votre Pin") }}
+            className="mt-4 text-sm text-red-500 block mx-auto"
+          >
+            Code pin oublié !
+          </button>
+          </div>
         </Modal>
       )}
     </>

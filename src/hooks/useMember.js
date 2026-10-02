@@ -11,7 +11,9 @@ export const useMember = () => {
   const { setItem, removeItem } = useLocalStorage();
   const redirect = useRedirect();
   const [members, setMembers] = useState([]);
+  const [pendingMembers, setPendingMembers] = useState([]);
   const [member, setMember] = useState(null);
+  const [VerifyMembers, setVerifyMembers] = useState([]);
   // const members = membersOnLocal();
   // const userId = user.id;
 
@@ -19,7 +21,7 @@ export const useMember = () => {
   const updatemember = async (memberId, updateData) => {
     setLoading(true);
     try {
-      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.member.UPDATE}/${memberId}`;
+      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.MEMBER.UPDATE}/${memberId}`;
       logData("fetchUrl", url);
       const response = await api.put(url, { updateData });
       logData("response on update member", response);
@@ -40,11 +42,11 @@ export const useMember = () => {
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.MEMBER.GET_ALL}`;
       logData("fetchUrl", url);
       const response = await api.get(url);
-      logData("response on add member", response);
+      logData("response on getAll member", response);
       const members = response?.data?.members;
       logData("members on fetch", members);
       setItem("members", members);
-      setmembers(members);
+      setVerifyMembers(members);
     } catch (error) {
       console.error("login error", error);
     } finally {
@@ -62,7 +64,7 @@ export const useMember = () => {
       const members = response?.data?.pendingMembers;
       logData("members on fetch", members);
       setItem("members", members);
-      setMembers(members);
+      setPendingMembers(members);
     } catch (error) {
       console.error("login error", error);
     } finally {
@@ -91,7 +93,7 @@ export const useMember = () => {
   const deletemember = async (memberId) => {
     setLoading(true);
     try {
-      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.member.DELETE_ONE}/${memberId}`;
+      const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.MEMBER.DELETE_ONE}/${memberId}`;
       logData("fetchUrl", url);
       const response = await api.delete(url);
       logData("response on delete member", response);
@@ -109,6 +111,8 @@ export const useMember = () => {
     loading,
     member,
     members,
+    VerifyMembers,
+    pendingMembers,
     updatemember,
     getAllmembers,
     getmember,

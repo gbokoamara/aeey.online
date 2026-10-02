@@ -40,8 +40,6 @@ export const ValidateMemberPage = () => {
         : m
     );
 
-    setMembers(updatedMembers);
-
     // passer au suivant
     if (currentIndex + 1 < members.length) {
       setCurrentIndex(currentIndex + 1);

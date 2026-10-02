@@ -3,25 +3,29 @@ import { UpdateForm } from "../component/form/profilForm";
 import { useUser } from "../hooks/useUser";
 import { PagesCard } from "../component/pages/PagesCard";
 import { useAppNavigation } from "../hooks/useAppNavigation";
+import { handleVerification } from "../helper/toasterHelper";
 
 export const MemberPage = () => {
   const { memberRequest } = useUser()
   const {goTo} = useAppNavigation()
 
   const handleSubmit = async (cardData) => {
-     alert("demande de verification soumis avec succès !")
-    const response = await memberRequest(cardData)
+     handleVerification(" Voulez-vous enregistrer votre demande de verification ? ",
+      async () => {
+        const response = await memberRequest(cardData)
+        if (response.status === true) {
+          goTo("/paiement", {
+            state: {
+              type:"cautisation",
+              cautisationName: "Adhésion",
+              member: response?.member,
+            },
+          });
+        }
+
+      }
+     )
     
-    // console.log("response ", response)
-    if (response.status === true) {
-      goTo("/paiement", {
-      state: {
-        type:"cautisation",
-        cautisationName: "Adhésion",
-        member: response?.member,
-      },
-    });
-    }
   };
   const title= "Vérification membre"
   return (

@@ -8,7 +8,7 @@ import { logData } from "../../utils/console";
 const PaymentList = ({payments}) => {
 console.log("payments", payments)
   return (
-    <div className="grid gap-2 ">
+    <div className="grid ">
       {payments.map((payment) => (
         <PaymentCard payment={payment} key={payment.id}/>
       ))}

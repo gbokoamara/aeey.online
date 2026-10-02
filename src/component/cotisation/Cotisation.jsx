@@ -10,6 +10,7 @@ import { useCotisation } from "../../hooks/useCotisation";
 import { dateUi } from "../../helper/date";
 import { capitalize } from "../../helper/Capitalizer";
 import { CotisationCard } from "./CotisationCard";
+import { Loading } from "../../utils/Loading";
 
 export const Cotisation = () => {
   const [activeModal, setActiveModal] = useState(false);
@@ -28,7 +29,7 @@ export const Cotisation = () => {
     deleteCotisation,
   } = useCotisation();
 
-  logData("cotisations", cotisations)
+  // logData("cotisations", cotisations)
   const [form, setForm] = useState({ //     
     title: "",
     description: "",
@@ -133,7 +134,7 @@ export const Cotisation = () => {
   const inactiveCount = total - activeCount;
 
   if (loading) {
-    return <div>Chargement en cours ...</div>;
+    return <Loading />;
   }
   return (
     <div className="md:p-6 grid  gap-6">

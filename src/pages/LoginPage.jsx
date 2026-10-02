@@ -4,10 +4,10 @@ import '../App.css'
 import Button from '../utils/button'
 import {useNavigate, useSearchParams} from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
-import { logData } from '../utils/console'
 import { formatPhoneNumber } from '../helper/formatInputNumber'
 import PhoneInput from '../utils/phoneInput'
-
+import { logData } from '../utils/console'
+import { toastWarning } from '../helper/toasterHelper'
 
 export const LoginPage = () => {
   const { login } = useAuth();  
@@ -15,6 +15,8 @@ export const LoginPage = () => {
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
   const [searchParams] = useSearchParams();
+  const redirect = searchParams.get("redirect") || sessionStorage.getItem("redirectAfterLogin") || localStorage.getItem("redirectAfterLogin");
+  logData("redirect", redirect)
 
   
 const [form, setForm]=useState({
@@ -37,24 +39,32 @@ const handleCountryChange = ({ code, iso, name }) => {
     countryIso: iso,
   }));
 };
-  
-  const handleSubmit = async (e) => {
-    try {
-      setLoading(true)
-      e.preventDefault()
-      if (!form.number) {
-        return alert("Numero de téléphone obligatoire !")
-      }
-      // logData("form", form)
-      const userData =  await login(form);
-      const redirect = searchParams.get("redirect");
-      navigate(redirect || "/home", { state: { userData }, replace: true,});
-    } catch (error) {
-      console.log(error)
-    } finally {
-      setLoading(false)
+
+const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!form.number) {
+        return toastWarning(" Numero de téléphone obligatoire !");
     }
-  }
+
+    try {
+        setLoading(true);
+
+        const userData = await login(form);
+
+        if (userData) {
+            navigate(redirect || "/home", {
+                state: { userData },
+                replace: true,
+            });
+        }
+
+    } catch (error) {
+        console.error("LOGIN ERROR :", error);
+    } finally {
+        setLoading(false);
+    }
+};
 
   return (
     <>
@@ -66,11 +76,9 @@ const handleCountryChange = ({ code, iso, name }) => {
               <h1 className='uppercase font-serif font-bold'>bienvenue chez A.E.E.Y !</h1>
               <p className='font-serif text-blue-800'>Pour commencer, entrez votre numero de téléphone.</p>
             </div>
-            {/* <div>
-              <Input type={"text"} placeholder={"Nom"}  onChange={(e)=> setName(e.target.value)} />
-            </div> */}
+            
             <div className='text-center w-full'>
-              {/* <Input type={"tel"} placeholder={"Telephone: 0701010102"} onChange={(e)=> setPhone(formatPhoneNumber(e.target.value))} value={phone} required={true}  /> */}
+             
               <div className="flex rounded-xl ">
                 <PhoneInput
                   type="tel"
@@ -84,7 +92,7 @@ const handleCountryChange = ({ code, iso, name }) => {
                     handleChange("number", e.target.value)
                   }
                   className="flex-1 px-3 py-3 outline-none"
-                  placeholder="Numéro de Téléphone"
+                  placeholder=" 00 05 06 08 11"
                 />
               </div>
             </div>

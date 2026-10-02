@@ -11,6 +11,7 @@ export const useEvent = () => {
   const { setItem, removeItem } = useLocalStorage();
   const redirect = useRedirect();
   const [events, setEvents] = useState([]);
+  const [eventStats, setEventStats] = useState([]);
   const [event, setEvent] = useState(null);
   // const events = EventsOnLocal();
   // const userId = user.id;
@@ -75,9 +76,9 @@ export const useEvent = () => {
       const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.EVENT.GET_ALL_ACTIVE}`;
       // logData("fetchUrl", url);
       const response = await api.get(url);
-      // logData("response on add event", response);
+      const eventStats = response?.data?.eventStats;
       const events = response?.data?.events;
-      // logData("events on fetch", events);
+      setEventStats(eventStats)
       setItem("events", events);
       setEvents(events);
     } catch (error) {
@@ -162,6 +163,7 @@ export const useEvent = () => {
     loading,
     event,
     events,
+    eventStats,
     addEvent,
     updateEvent,
     getAllEvents,

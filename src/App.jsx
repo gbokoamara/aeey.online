@@ -15,6 +15,7 @@ import { PaymentsPage } from "./pages/PaymentsPage"
 import { ApprovedExpense } from "./pages/ApprovedExpense"
 import { ProjectPage } from "./pages/ProjectPage"
 import { Toaster } from "sonner"
+import { ResetPasswordPage } from "./pages/ResetPassword"
 
 
 
@@ -39,7 +40,8 @@ function App() {
         <Route path="/event/:id" element={<EventDetail />} />
         <Route path="/payments" element={<PaymentsPage/>} />
         <Route path="/expenses/:id" element={<ApprovedExpense/>} />
-        <Route path="/project" element={<ProjectPage/>} />
+        <Route path="/project" element={<ProjectPage/>} /> 
+        <Route path="/reset-password" element={<ResetPasswordPage/>} /> 
     </Routes>
    </Router>
    <Toaster position="top-right" richColors />

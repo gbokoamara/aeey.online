@@ -5,13 +5,13 @@ import { dateUi, shortDateUi } from "../../helper/date";
 const enumTypes = [
   {
     key: "COTISATION",
-    label: "Cotisation de",
+    label: "Cotisation:",
     color: "text-blue-800",
     sign : "+"
   },
   {
     key: "COTISATION_TIER",
-    label: "Cotisation (tierce)",
+    label: "Cotisation:",
     color: "text-blue-800",
     sign : "+"
   },
@@ -56,23 +56,25 @@ export const PaymentCard = ({ payment }) => {
       <Link
         to={`/paiment-detail/${payment.id}`}
         className={`
-          grid py-2 md:p-3  hover:bg-gray-100 transition w-full
-          ${types.key ? types.color : "text-green-500 "}
+          grid py-2  md:p-3  hover:bg-gray-100 transition w-full
+          ${types?.key ? types?.color : "text-green-500 "}
           `}
       >
-      <div className="grid w-full">
+      <div className="grid ">
         <div className=" flex md:grid md:grid-cols-3 ">
             {/* Label + nom */}
             <div className="flex gap-2 text-start min-w-0 ">
-              <p className="font-semibold whitespace-nowrap">{types.label}</p>
+              <p className="font-semibold whitespace-nowrap">{types?.label}</p>
               <p className="font-serif truncate">{payment?.name?.toLowerCase()}</p>
             </div>
 
             {/* Montant */}
-            <div className="ml-auto md:ml-0 md:flex md:justify-center">
-              <p className="font-bold whitespace-nowrap">
-                {types.sign} {payment?.amount} FCFA
+            <div className=" flex gap-1 ml-auto md:ml-0 md:flex md:justify-center">
+              <span className="font-light ">{types?.sign}</span>
+              <p className="font-medium whitespace-nowrap">
+                 {payment?.amount} 
               </p>
+               <span className="font-serif ">fcfa</span>
             </div>
 
             {/* Date */}

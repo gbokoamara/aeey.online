@@ -10,6 +10,7 @@ import api from "../config/axios";
 export const useUser = () => {
     const [ loading, setLoading ] = useState(false);
     const [ user, setUser ] = useState(null);
+    const [ member, setMember ] = useState(null);
     const {setItem, removeItem} = useLocalStorage();
     const redirect = useRedirect();
     const users = userOnLocal();
@@ -26,6 +27,24 @@ export const useUser = () => {
             logData("userData on pass", user)
             setItem("user", user)
             setUser(user)
+        } catch (error) {
+            console.error("login error", error)
+        } finally {
+            setLoading(false)
+        }
+        
+    };
+
+    const getUserByNumber = async (number) => {
+        logData("number", number)
+        setLoading(true)
+        try {
+            const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.USER.GET_USER_BY_NUMBER}/${number}`
+            const response = await api.get(url,)
+            const member = response?.data?.member
+            setItem("member", member)
+            setMember(member)
+            return member
         } catch (error) {
             console.error("login error", error)
         } finally {
@@ -120,10 +139,10 @@ export const useUser = () => {
             // logData("passUrl", url)
             const response = await api.get(url,payementData )
             // logData("response on get-payment", response)
-            const payment = response?.data?.payment
-            logData("userData on user payment", payment)
+            const {payment, record, fusionPay} = response?.data
+            // logData("userData on user payment", response)
             setItem("payment", payment)
-            return payment
+            return fusionPay
         } catch (error) {
             console.error("login error", error)
         } finally {
@@ -151,6 +170,6 @@ export const useUser = () => {
         
     };
 
-    return {userOnApi:user, loading, getUser, update, memberRequest, cardRequest, getCard, makePayment, getPayment};
+    return {userOnApi:user, member,  loading, getUser, update, memberRequest, cardRequest, getCard, makePayment, getPayment, getUserByNumber};
 }
 

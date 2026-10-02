@@ -3,13 +3,23 @@ const BASE_URL = import.meta.env.VITE_API_URL
 export const API_CONFIG = {
     BASE_URL: BASE_URL ,
     ENDPOINTS:{
+        ADMIN:{
+            ADD_MODERATOR : "/admin/add-moderator",
+            GET_MODERATOR : "/admin/get-moderator",
+            GET_MODERATORS : "/admin/get-moderators",
+            REMOVE_MODERATOR : "/admin/remove-moderator",
+            MANAGE : "/admin/manage"
+        },
         AUTH:{
             REGISTER : "/auth/login",
             PASSWORD : "/auth/password",
-            VERIFY_PASSWORD : "/auth/password-verify"
+            VERIFY_PASSWORD : "/auth/password-verify",
+            FORGOT_PASSWORD : "/auth/forgot-password",
+            RESET_PASSWORD : "/auth/reset-password"
         },
         USER:{
             GET_USER : "/user/profil",
+            GET_USER_BY_NUMBER : "/user/get-by-number",
             UPDATE : "/user/update-profil",
             MEMBER_REQUEST : "/user/member-request",
             CARD_REQUEST : "/user/card-request",
@@ -55,7 +65,7 @@ export const API_CONFIG = {
             DELETE_ONE : "/expense/delete",
             APPROVE_ONE : "/expense/approve",
             REJECT_ONE : "/expense/reject",
-            // approve reject
+            GET_APPROVED : "/expense/get-approved-expenses", 
          },
          PAYMENT:{
             ADD: "/payment/add",

@@ -3,6 +3,7 @@ import { useRef, useState } from "react";
 import html2canvas from "html2canvas";
 import { useCard } from "../../../hooks/useCard";
 import { logData } from "../../../utils/console";
+import { Loading } from "../../../utils/Loading";
 
 export default function CarteMembreAEEY() {
   const cardRef = useRef(null);
@@ -74,9 +75,7 @@ export default function CarteMembreAEEY() {
 
   if (loading) {
     return (
-      <div className="w-full h-full rounded-2xl bg-[#0d1b35] flex items-center justify-center">
-        <p className="text-white/40 text-xs animate-pulse">Chargement de la carte...</p>
-      </div>
+      <Loading />
     );
   }
 

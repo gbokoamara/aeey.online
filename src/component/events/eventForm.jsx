@@ -5,6 +5,7 @@ import { useEvent } from "../../hooks/useEvent";
 import { Modal } from "../../utils/Modal";
 import { logData } from "../../utils/console";
 import FileUpload from "../../utils/fileUpload";
+import { Loading } from "../../utils/Loading";
 
 export const AddEvent = () => {
   const [activeModal, setActiveModal] = useState(false);
@@ -157,7 +158,7 @@ export const AddEvent = () => {
   const inactiveCount = total - activeCount;
 
   if (loading) {
-    return <div>Chargement en cours ...</div>;
+    return <Loading />;
   }
   return (
     <div className="p-6 grid  gap-6">

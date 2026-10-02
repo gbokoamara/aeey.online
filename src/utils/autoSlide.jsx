@@ -115,7 +115,7 @@ const AutoSlide = forwardRef(({ children, interval = 3000 }, ref) => {
       {/* Bouton pause */}
       <button
         onClick={() => setPaused((p) => !p)}
-        className="absolute -top-7 left-0 z-10 bg-black/80 hover:bg-black/80 text-white rounded p-1.5 transition "
+        className="absolute top-1 right-2 z-10 bg-black hover:bg-black/80 text-white rounded p-1.5 transition "
       >
         {paused ? (
           <svg
