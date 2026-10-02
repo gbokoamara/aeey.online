@@ -161,10 +161,10 @@ export const AddEvent = () => {
     return <Loading />;
   }
   return (
-    <div className="p-6 grid  gap-6">
+    <div className="md:p-6 grid  gap-6">
       {/* <div className="bg-indigo-500 w-full h-10"> */}
       {/* zone de filtre et stats + boutton ajouter */}
-      <div className="bg-white shadow-md rounded-2xl p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="bg-white shadow-md rounded-2xl md:p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         {/* LEFT: STATS */}
         <div className="flex gap-4 text-sm">
           <div className="bg-gray-100 px-3 py-1 rounded-xl">
@@ -252,7 +252,7 @@ export const AddEvent = () => {
                   </label>
                 </div>
 
-                <div className="flex flex-wrap gap-2 pt-2 justify-between">
+                <div className="grid grid-cols-2 gap-2 pt-2 md:flex md:flex-wrap md:justify-between">
                   <Button
                     children="Modifier"
                     onClick={(e) => {
@@ -261,8 +261,9 @@ export const AddEvent = () => {
                       setReschedule("Modifier");
                       setActiveModal(true);
                     }}
-                    className="w-20 bg-blue-500 text-white"
+                    className="w-full min-w-0 bg-blue-500 text-white text-sm px-2"
                   />
+
                   <Button
                     children="Reprogrammer"
                     onClick={(e) => {
@@ -271,8 +272,9 @@ export const AddEvent = () => {
                       setReschedule("Reprogrammer");
                       setActiveModal(true);
                     }}
-                    className="w-28 bg-blue-500 text-white"
+                    className="w-full min-w-0 bg-blue-500 text-white text-sm px-2"
                   />
+
                   <Button
                     children="Reporter"
                     onClick={(e) => {
@@ -281,7 +283,7 @@ export const AddEvent = () => {
                       setReschedule("Reporter");
                       setActiveModal(true);
                     }}
-                    className="w-20 bg-blue-500 text-white"
+                    className="w-full min-w-0 bg-blue-500 text-white text-sm px-2"
                   />
 
                   <Button
@@ -290,7 +292,7 @@ export const AddEvent = () => {
                       e.stopPropagation();
                       handleDelete(event.id);
                     }}
-                    className="w-20 bg-red-500 text-white"
+                    className="w-full min-w-0 bg-red-500 text-white text-sm px-2"
                   />
                 </div>
               </div>
@@ -307,7 +309,7 @@ export const AddEvent = () => {
             showCloseButton={false}
           >
             {/* FORMULAIRE */}
-            <div className="bg-white shadow-xl  rounded-2xl p-5 space-y-4">
+            <div className="bg-white shadow-xl  rounded-2xl md:p-5 space-y-4">
               <h2 className="text-xl font-semibold">{getTitle()}</h2>
 
               <Input
@@ -365,13 +367,13 @@ export const AddEvent = () => {
               />
 
               <div className="flex gap-2">
-                <Button onClick={handleSubmit}>{submitTitle()}</Button>
-
                 {reschedule && (
-                  <Button onClick={resetForm} variant="secondary">
+                  <Button onClick={resetForm} variant="secondary" className="bg-gray-500">
                     Annuler
                   </Button>
                 )}
+                
+                <Button onClick={handleSubmit}>{submitTitle()}</Button>
               </div>
             </div>
           </Modal>
