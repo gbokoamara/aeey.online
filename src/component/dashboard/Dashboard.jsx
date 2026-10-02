@@ -14,7 +14,7 @@ export const Dashboard = () => {
   const [configValue, setConfigValue] = useState("");
 
   const {
-      members, pendingMembers, 
+      VerifyMembers, pendingMembers, 
       getAllmembers, getPendingMembers 
   } = useMember();
   
@@ -31,7 +31,7 @@ export const Dashboard = () => {
      getAllPayments,
      getPaymentStat,
    } = usePayment();
-  const { expenseStats, approvedEXpenses, getApprovedExpense } = useExpense();
+  const { expenseStats, approvedExpenses, getApprovedExpense } = useExpense();
   const { events, eventStats, getAllActiveEvents } = useEvent();
 
   const StatsToMap = [
@@ -39,7 +39,7 @@ export const Dashboard = () => {
       label: "Membres",
       seeMore: "voir +",
       title: "member",
-      name: ` Total :${members.length}`,
+      name: ` Total :${VerifyMembers.length}`,
     },
     {
       label: "Modérateurs",
@@ -58,6 +58,7 @@ export const Dashboard = () => {
       seeMore: "voir +",
       title: "expenses",
       name: ` Solde : ${expenseStats?.totalAmount || 0}`,
+      total: ` Total : ${management?.initialBalance + management?.balance || 0}`,
     },
     {
       label: "Evenements",
@@ -338,7 +339,7 @@ export const Dashboard = () => {
           <div>
             <h2 className="text-lg font-semibold mb-2">Membres</h2>
             <ul className="divide-y">
-              {members.map((m) => (
+              {VerifyMembers.map((m) => (
                 <li key={m.id} className="py-2">
                   {m.name ?? m.email}
                 </li>
@@ -353,7 +354,7 @@ export const Dashboard = () => {
               Membres en attente de validation
             </h2>
             <ul className="divide-y">
-              {pendingMembers.map((m) => (
+              {pendingVerifyMembers.map((m) => (
                 <li
                   key={m.id}
                   className="py-2 flex justify-between items-center"
@@ -371,15 +372,15 @@ export const Dashboard = () => {
             <h2 className="text-lg font-semibold mb-2">Dépenses</h2>
             <div className=" md:flex  gap-4 ">
               <h3 className="text-lg  mb-2">
-                Total : <strong>{expenseStats.total}</strong>
+                Total : <strong>{management?.solde || 0 }</strong>
               </h3>
               <h3 className="text-lg  mb-2">
                 Montant des dépenses :{" "}
-                <strong>{expenseStats.totalAmount}</strong>
+                <strong>{expenseStats?.totalAmount || 0}</strong>
               </h3>
             </div>
             <ul className="divide-y">
-              {approvedEXpenses.map((e) => (
+              {approvedExpenses.map((e) => (
                 <li key={e.id} className="py-2">
                   {e.name ?? e.status} - {e.amount} est {e.status}
                 </li>
