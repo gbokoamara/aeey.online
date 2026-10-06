@@ -3,7 +3,6 @@ import { useEffect, useState, useRef } from "react";
 import PinInput from "../utils/pinInput";
 import { useAuth } from "../hooks/useAuth";
 import { useLocalStorage } from "../hooks/useLocalStorage";
-import { logData } from "../utils/console";
 import { Modal } from "../utils/Modal";
 import { usePayment } from "../hooks/usePayment";
 import { formatNumber } from "../helper/formatNumber";

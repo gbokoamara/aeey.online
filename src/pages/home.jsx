@@ -22,10 +22,18 @@ export const HomePage = () => {
   const { createPin } = useAuth();
   const {checkPayment} = useWebhook();
   const {getRequestCard} = useCard()
-  const { setItem } = useLocalStorage();
+  const { setItem, getItem, removeItem, clear } = useLocalStorage();
   const { getState } = useAppNavigation();
   const [showCreatePin, setShowCreatePin] = useState(false);
   const { loading, payments, getAllPayments,} = usePayment();
+
+  const token = getItem("token")
+  console.log("token =>", token)
+  if (!token || token === undefined) {
+    window.location.href ="/"
+    removeItem()
+    clear()
+  }
   
   const state = getState();
 

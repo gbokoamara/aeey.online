@@ -49,8 +49,19 @@ api.interceptors.response.use(
     }
     
     if (status === 404) {
-      toastError(message || "Route non définie");
-      return Promise.reject(error);
+      toastError(message)
+      // Supprimer le token expiré
+      removeItem("token");
+      clear()
+
+      // Récupérer la page actuelle
+      const currentPath =
+        window.location.pathname +
+        window.location.search;
+
+      // Rediriger vers la connexion
+      window.location.href =`/?redirect=${encodeURIComponent(currentPath)}`;
+    
     }
 
     if (status === 400) {

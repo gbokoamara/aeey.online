@@ -11,7 +11,8 @@ export const API_CONFIG = {
             MANAGE : "/admin/manage"
         },
         AUTH:{
-            REGISTER : "/auth/login",
+            LOGING : "/auth/login",
+            REGISTER : "/auth/register",
             PASSWORD : "/auth/password",
             VERIFY_PASSWORD : "/auth/password-verify",
             FORGOT_PASSWORD : "/auth/forgot-password",
