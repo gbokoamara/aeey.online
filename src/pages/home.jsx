@@ -112,7 +112,7 @@ export const HomePage = () => {
           <div className="h-44">
             <Events />
           </div>
-          <div className="  w-screen md:w-3xl px-1 py-2 rounded gap-2"
+          <div className="  w-screen md:w-3xl px-2 md:px-1 py-2 rounded gap-2"
           // className=" w-[95%] md:w-[65%] lg:w-[40%]"
           >
             <PaymentList payments={payments} />
