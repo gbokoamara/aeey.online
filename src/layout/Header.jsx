@@ -79,7 +79,7 @@ const Header = () => {
         setShowBalance(false);
       }, 30000);
     } else {
-      toastError("PIN incorrect");
+      // toastError("PIN incorrect");
       setPinKey((prev) => prev + 1);
     }
     }
